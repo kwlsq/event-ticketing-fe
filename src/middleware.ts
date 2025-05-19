@@ -2,12 +2,12 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { auth } from "@/auth";
 
-const PUBLIC_PATHS = ["/login", "/register", "/transactiondetail"];
-const PROTECTED_PATHS = ["/dashboard", "/trx/reports"];
+const PUBLIC_PATHS = ["*"];
 const ROLE_PATHS = {
-  organizer: PUBLIC_PATHS,
-  user: PUBLIC_PATHS,
+    organizer: ["/organizer", "/organizer/*"],
+    user: ["/user", "/user/*"],
 };
+const PROTECTED_PATHS = [...ROLE_PATHS.organizer,...ROLE_PATHS.user, "/transaction"];
 
 async function getSession() {
   return await auth();
