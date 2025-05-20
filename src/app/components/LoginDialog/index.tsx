@@ -12,7 +12,6 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { useRouter } from "next/navigation";
 import { signIn, useSession } from "next-auth/react";
 
 const formSchema = z.object({
@@ -23,7 +22,6 @@ const formSchema = z.object({
 type FormData = z.infer<typeof formSchema>;
 
 export default function LoginDialog() {
-  const router = useRouter();
   const [openLoginDialog, setOpenLoginDialog] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -32,7 +30,7 @@ export default function LoginDialog() {
     onUnauthenticated: () => {
       console.log(session);
       console.log("Session expired, opening login dialog...");
-      setOpenLoginDialog(true);
+      // setOpenLoginDialog(true);
     },
   });
 
@@ -63,14 +61,7 @@ export default function LoginDialog() {
           result?.error || "An unexpected error occurred. Please try again."
         );
       } else {
-        if (
-          session?.user.roles.includes("ADMIN") ||
-          session?.user.roles.includes("ORGANIZER")
-        ) {
-          router.push("/dashboard");
-        } else {
-          router.push("/");
-        }
+        setOpenLoginDialog(!openLoginDialog);
       }
     } catch (error) {
       console.error("An unexpected error occurred:", error);
@@ -97,6 +88,7 @@ export default function LoginDialog() {
             <input
               id="email"
               type="email"
+              placeholder="Type your email"
               {...register("email")}
               className="border border-gray-300 p-2 rounded text-black"
             />
@@ -111,6 +103,7 @@ export default function LoginDialog() {
             <input
               id="password"
               type="password"
+              placeholder="Type your password"
               {...register("password")}
               className="border border-gray-300 p-2 rounded text-black"
             />
@@ -118,13 +111,19 @@ export default function LoginDialog() {
               <span className="text-red-500">{errors.password.message}</span>
             )}
           </div>
-          <Button
-            disabled={isLoading}
-            type="submit"
-            className="bg-blue-500 text-white p-2 rounded"
-          >
-            {isLoading ? "Loading..." : "Login"}
-          </Button>
+          <div className="flex flex-col items-center gap-2">
+            <Button
+              disabled={isLoading}
+              type="submit"
+              size="action"     
+            >
+              {isLoading ? "Loading..." : "Login"}
+            </Button>
+            <p>
+              Don’t have an account? <span className="text-primary font-medium">Create Account</span>
+            </p>
+          </div>
+
           {error && <span className="text-red-500">{error}</span>}
         </form>
       </DialogContent>
