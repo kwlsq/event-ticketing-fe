@@ -78,11 +78,11 @@ export default function LoginDialog() {
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Login</DialogTitle>
+          <DialogTitle className="text-2xl font-bold">Login</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
-            <label htmlFor="email" className="font-medium">
+            <label htmlFor="email" className="font-medium text-sm">
               Email
             </label>
             <input
@@ -90,14 +90,14 @@ export default function LoginDialog() {
               type="email"
               placeholder="Type your email"
               {...register("email")}
-              className="border border-gray-300 p-2 rounded text-black"
+              className="border border-gray-300 p-2 rounded text-black text-sm"
             />
             {errors.email && (
               <span className="text-red-500">{errors.email.message}</span>
             )}
           </div>
           <div className="flex flex-col gap-2">
-            <label htmlFor="password" className="font-medium">
+            <label htmlFor="password" className="font-medium text-sm">
               Password
             </label>
             <input
@@ -105,13 +105,13 @@ export default function LoginDialog() {
               type="password"
               placeholder="Type your password"
               {...register("password")}
-              className="border border-gray-300 p-2 rounded text-black"
+              className="border border-gray-300 p-2 rounded text-black text-sm"
             />
             {errors.password && (
               <span className="text-red-500">{errors.password.message}</span>
             )}
           </div>
-          <div className="flex flex-col items-center gap-2">
+          <div className="flex flex-col items-center gap-2 mt-5">
             <Button
               disabled={isLoading}
               type="submit"
@@ -119,8 +119,8 @@ export default function LoginDialog() {
             >
               {isLoading ? "Loading..." : "Login"}
             </Button>
-            <p>
-              Don’t have an account? <span className="text-primary font-medium">Create Account</span>
+            <p className="text-sm">
+              Don’t have an account? <span className="text-primary font-medium cursor-pointer">Create Account</span>
             </p>
           </div>
 
