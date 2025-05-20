@@ -24,7 +24,7 @@ export default async function RootLayout({
     <html lang="en">
       <SessionProvider refetchInterval={120} session={session}>
       <body
-        className={`${plusJakarta.variable} ${plusJakarta.variable} antialiased`}
+        className={`${plusJakarta.className} antialiased`}
       >
         {children}
       </body>

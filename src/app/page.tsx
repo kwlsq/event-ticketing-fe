@@ -1,3 +1,6 @@
+import { Button } from "@/components/ui/button";
+import EventCard from './components/Event Card/index';
+import DatePicker from './components/Date Picker/index';
 import {
   Dialog,
   DialogContent,
@@ -7,6 +10,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+
+const eventDetails = {
+  imageUrl: "https://res.cloudinary.com/ddk6cxc7c/image/upload/v1/purwafest_event/r7qqtw8d6rdieoxgyhmm",
+  name: "Rock n Ride Music Festival",
+  date: "May 5, 2025",
+  time: 1900,
+  venue: "Gelora Bung Karno Stadium",
+  location: "Jakarta",
+  startingPrice: 100000
+};
 
 export default function Home() {
   return (
@@ -24,15 +37,24 @@ export default function Home() {
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
-              hi
+            hi
           </div>
           <DialogFooter>
             exit
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      <Button>Button</Button>
+      <EventCard
+        {...eventDetails}
+      />
+      <div>
+        <DatePicker />
+        <Button>Submit</Button>
+      </div>
       <button>Register</button>
       <button>Register User</button>
+
     </div>
   );
 }
