@@ -3,6 +3,7 @@ import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { SessionProvider } from "next-auth/react";
 import { auth } from "@/auth";
+import { EventProvider } from "./context/use-event";
 
 const plusJakarta = Plus_Jakarta_Sans({
   variable: "--font-jakarta",
@@ -23,11 +24,13 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <SessionProvider refetchInterval={120} session={session}>
-      <body
-        className={`${plusJakarta.className} antialiased`}
-      >
-        {children}
-      </body>
+        <body
+          className={`${plusJakarta.className} antialiased`}
+        >
+          <EventProvider>
+            {children}
+          </EventProvider>
+        </body>
       </SessionProvider>
     </html>
   );
