@@ -3,6 +3,7 @@
 import EventCard from './components/Event Card/index';
 import DynamicPagination from './components/Dynamic Pagination';
 import { useEvents } from './context/use-event';
+import AuthDialog from './components/AuthDialog';
 
 export default function Home() {
 
@@ -11,6 +12,7 @@ export default function Home() {
   if (events !== undefined) {
     return (
       <div className="mx-[100px]">
+        <AuthDialog></AuthDialog>
         <div className="flex flex-wrap gap-5">
           {events.map((event) => (
             <div key={event.id} className="w-[272px]">
