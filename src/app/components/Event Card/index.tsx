@@ -52,7 +52,7 @@ const EventCard : FC<EventProps> = ({imageUrl, name, date, time, venue, location
           {venue}, {location}
         </CardDescription>
       </CardContent>
-      <CardFooter className="text-base">
+      <CardFooter className="text-base pb-4">
         From IDR {startingPrice}K
       </CardFooter>
     </Card>
