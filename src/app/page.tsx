@@ -53,6 +53,7 @@ export default function Home() {
         ))}
       </div>
       <DynamicPagination/>
+      <DynamicPagination/>
     </div>
   );
 }
