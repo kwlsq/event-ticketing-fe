@@ -1,3 +1,4 @@
+import AuthDialog from "./components/AuthDialog"
 import EventCard from './components/Event Card/index';
 import DynamicPagination from './components/Dynamic Pagination';
 
@@ -43,6 +44,7 @@ const eventDetails = [
 export default function Home() {
   return (
     <div className="mx-[100px]">
+      <AuthDialog/>
       <div className="flex flex-wrap gap-5">
         {eventDetails.map((event) => (
           <div key={event.name} className="w-[272px]">
