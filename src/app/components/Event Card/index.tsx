@@ -11,7 +11,6 @@ import Image from "next/image";
 import { FC } from "react";
 
 interface EventProps {
-  imageUrl: string,
   name: string,
   date: string,
   time: number,
@@ -20,12 +19,12 @@ interface EventProps {
   startingPrice: number
 }
 
-const EventCard : FC<EventProps> = ({imageUrl, name, date, time, venue, location, startingPrice}) => {
+const EventCard : FC<EventProps> = ({name, date, time, venue, location, startingPrice}) => {
   return (
     <Card className="shadow-none border-none p-0">
       <CardHeader className="p-0 gap-0">
         <Image
-          src= {imageUrl}
+          src= {"https://res.cloudinary.com/ddk6cxc7c/image/upload/v1/purwafest_event/r7qqtw8d6rdieoxgyhmm"}
           width={295}
           height={200}
           alt="event image"
