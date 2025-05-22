@@ -10,23 +10,25 @@ export default function Home() {
 
   if (events !== undefined) {
     return (
-      <div className="mx-[100px]">
+      <div>
         <Navbar />
-        <div className="flex flex-wrap gap-5">
-          {events.map((event) => (
-            <div key={event.id} className="w-[272px]">
-              <EventCard
-                name={event.name}
-                date={event.date}
-                venue={event.venue}
-                location={event.location}
-                time={900}
-                startingPrice={event.startingPrice}
-              />
-            </div>
-          ))}
+        <div className="mx-[100px]">
+          <div className="flex flex-wrap gap-5">
+            {events.map((event) => (
+              <div key={event.id} className="w-[272px]">
+                <EventCard
+                  name={event.name}
+                  date={event.date}
+                  venue={event.venue}
+                  location={event.location}
+                  time={900}
+                  startingPrice={event.startingPrice}
+                />
+              </div>
+            ))}
+          </div>
+          <DynamicPagination />
         </div>
-        <DynamicPagination />
       </div>
     );
   }

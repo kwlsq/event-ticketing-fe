@@ -11,9 +11,9 @@ const Navbar = () => {
   };
   const { isOpenDialog, updateIsOpenDialog, isRegister, updateIsRegister } =
     useUserContext();
-    
+
   return (
-    <div className="flex w-full justify-between py-3">
+    <div className="flex justify-between py-3 border-b-2 px-[100px]">
       <Link href={"/"}>
         <Image
           height={40}
@@ -23,7 +23,9 @@ const Navbar = () => {
         />
       </Link>
       <div className="flex items-center gap-5">
-        <Link href={"/organizer"} className="font-semibold mr-10">Create Event</Link>
+        <Link href={"/organizer"} className="font-semibold mr-10 text-sm">
+          Create Event
+        </Link>
         <Button onClick={() => handleClickOpenDialog(false)}>Login</Button>
         <Button variant="outline" onClick={() => handleClickOpenDialog(true)}>
           Register
