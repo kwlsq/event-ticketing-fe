@@ -20,8 +20,12 @@ const formSchema = z.object({
 
 type FormData = z.infer<typeof formSchema>;
 
+interface Props {
+  setIsRegister: (value: boolean) => void;
+}
+
 const RegisterDialogContent: React.FC<Props> = ({ setIsRegister }) => {
-  const [openDialog, setopenDialog] = useState(false);
+  // const [openDialog, setopenDialog] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const {

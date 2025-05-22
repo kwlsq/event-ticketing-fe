@@ -6,7 +6,7 @@ import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import LoginDialogContent from "./LoginDialogContent";
 import RegisterDialogContent from "./RegisterDialogContent";
 
-export default function LoginDialog() {
+export default function AuthDialog() {
   const [isRegister, setIsRegister] = useState(false);
 
   const handleOpenDialog = (isRegister: boolean) => {
