@@ -32,7 +32,6 @@ const RegisterDialogContent = () => {
   const registrationType = params.type === "organizer" ? "organizer" : "user";
 
   const onSubmit = async (data: FormData) => {
-    console.log(data);
     setError(null);
     setIsLoading(true);
     try {

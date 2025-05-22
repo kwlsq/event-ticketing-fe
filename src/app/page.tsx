@@ -3,24 +3,15 @@
 import EventCard from "./components/Event Card/index";
 import DynamicPagination from "./components/Dynamic Pagination";
 import { useEvents } from "./context/use-event";
-import { Button } from "@/components/ui/button";
-import { useUserContext } from "./context/userContext";
-import AuthDialog from "./components/AuthDialog";
+import Navbar from "@/components/features/navbar/Navbar";
 
 export default function Home() {
-  const { isOpenDialog, updateIsOpenDialog, isRegister } = useUserContext();
-
   const { events } = useEvents();
 
   if (events !== undefined) {
     return (
       <div className="mx-[100px]">
-        <Button onClick={() => updateIsOpenDialog(true)}>Login</Button>
-        <AuthDialog
-          open={isOpenDialog}
-          setOpenDialog={updateIsOpenDialog}
-          isButtonRegister={isRegister}
-        ></AuthDialog>
+        <Navbar />
         <div className="flex flex-wrap gap-5">
           {events.map((event) => (
             <div key={event.id} className="w-[272px]">
