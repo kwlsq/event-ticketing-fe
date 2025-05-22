@@ -1,15 +1,22 @@
 "use client"
 
-import { useState } from 'react';
+import { FC, useState } from 'react';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, PaginationEllipsis } from '@/components/ui/pagination';
+import { useEvents } from '@/app/context/use-event';
 
-const DynamicPagination = () => {
+interface DynamicPaginationProps {
+  totalPages: number
+}
+
+const DynamicPagination : FC<DynamicPaginationProps> = ({totalPages}) => {
   const [currentPage, setCurrentPage] = useState(1);
-  const totalPages = 10;
+  const { setPage } = useEvents();
 
   const handlePageChange = (page: number) => {
     if(page >= 1 && page <= totalPages) {
       setCurrentPage(page);
+      // Pagination for event
+      setPage(page - 1);
     }
   };
 

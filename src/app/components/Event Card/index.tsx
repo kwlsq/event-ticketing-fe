@@ -19,32 +19,43 @@ interface EventProps {
   startingPrice: number
 }
 
-const EventCard : FC<EventProps> = ({name, date, time, venue, location, startingPrice}) => {
+const EventCard : FC<EventProps> = ({name, date, venue, location, startingPrice}) => {
+
+  const dateTimestamp = new Date(date);
+
+  // Get the day of date
+  const dayEvent = new Intl.DateTimeFormat('en-US', {weekday: 'long'}).format(dateTimestamp);
+
+  // Format the date to DD-MM-YYYY
+  const formattedDate = new Intl.DateTimeFormat('en-GB', {day: '2-digit', month: 'long', year: 'numeric'}).format(dateTimestamp);
+
+  // Format time to 24 hours
+  const formattedTime = new Intl.DateTimeFormat('en-GB', {hour: '2-digit', minute:'2-digit', hour12:false}).format(dateTimestamp);
+
   return (
-    <Card className="shadow-none border-none p-0">
+    <Card className="shadow-none border-none p-0 max-w-[295px]">
       <CardHeader className="p-0 gap-0">
         <Image
           src= {"https://res.cloudinary.com/ddk6cxc7c/image/upload/v1/purwafest_event/r7qqtw8d6rdieoxgyhmm"}
-          width={295}
-          height={200}
           alt="event image"
           className="rounded-2xl"
-        >
-        </Image>
+          quality={100}
+          layout="responsive"
+          width={295}
+          height={200}
+        />
       </CardHeader>
       <CardContent className="flex flex-col gap-2.5 p-0 justify-center">
         <CardTitle className="text-xl">
           {name}
         </CardTitle>
-        <div className="flex gap-3 align-center text-xl">
+        <div className="flex gap-3 items-center text-xl">
           <CardDescription>
-            {date}
+            {dayEvent.substring(0,3)}, {formattedDate}
           </CardDescription>
-          <CardDescription className="text-2xl leading-5">
-            &#x2022;
-          </CardDescription>
+          <CardDescription className="text-base w-1.5 h-1.5 bg-neutral-400 rounded-full"/>
           <CardDescription>
-            {time}
+            {formattedTime}
           </CardDescription>
         </div>
         <CardDescription className="line-clamp-1">
@@ -52,7 +63,7 @@ const EventCard : FC<EventProps> = ({name, date, time, venue, location, starting
         </CardDescription>
       </CardContent>
       <CardFooter className="text-base pb-4">
-        From IDR {startingPrice}K
+        From IDR {Math.floor(startingPrice / 1000)}K
       </CardFooter>
     </Card>
   )
