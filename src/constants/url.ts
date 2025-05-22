@@ -14,6 +14,7 @@ export const API_URL = {
     me: "/api/v1/auth/me",
   },
   user: {
-    detail: "/api/v1/users",
+    detail: "/api/v1/user",
+    register: "/api/v1/user/register"
   },
 };

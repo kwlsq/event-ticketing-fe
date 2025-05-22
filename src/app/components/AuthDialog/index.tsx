@@ -1,32 +1,37 @@
 "use client";
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
 import LoginDialogContent from "./LoginDialogContent";
 import RegisterDialogContent from "./RegisterDialogContent";
+import { DialogTitle } from "@radix-ui/react-dialog";
 
-export default function AuthDialog() {
-  const [isRegister, setIsRegister] = useState(false);
+interface Props {
+  open: boolean;
+  setOpenDialog: (val: boolean) => void;
+  isButtonRegister: boolean;
+}
 
-  const handleOpenDialog = (isRegister: boolean) => {
-    setIsRegister(isRegister);
-    console.log(isRegister);
-  };
-
+const AuthDialog: React.FC<Props> = ({
+  open,
+  setOpenDialog,
+  isButtonRegister,
+}) => {
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button onClick={() => handleOpenDialog(false)}>Login</Button>
-      </DialogTrigger>
-      <DialogTrigger asChild>
-        <Button onClick={() => handleOpenDialog(true)}>Register</Button>
-      </DialogTrigger>
-      {isRegister ? (
-        <RegisterDialogContent setIsRegister={setIsRegister}></RegisterDialogContent>
-      ) : (
-        <LoginDialogContent setIsRegister={setIsRegister}></LoginDialogContent>
-      )}
+    <Dialog open={open} onOpenChange={setOpenDialog}>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle className="text-2xl font-bold">
+            {isButtonRegister ? "Create account" : "Login"}
+          </DialogTitle>
+        </DialogHeader>
+        {isButtonRegister ? (
+          <RegisterDialogContent></RegisterDialogContent>
+        ) : (
+          <LoginDialogContent></LoginDialogContent>
+        )}
+      </DialogContent>
     </Dialog>
   );
-}
+};
+
+export default AuthDialog;

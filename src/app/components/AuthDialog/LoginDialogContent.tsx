@@ -1,14 +1,10 @@
-import {
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { signIn, useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
+import { useUserContext } from "@/app/context/userContext";
 
 const formSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -17,12 +13,8 @@ const formSchema = z.object({
 
 type FormData = z.infer<typeof formSchema>;
 
-interface Props {
-  setIsRegister: (value: boolean) => void;
-}
-
-const LoginDialogContent: React.FC<Props> = ({ setIsRegister }) => {
-  const [openDialog, setopenDialog] = useState(false);
+const LoginDialogContent = () => {
+  const { updateIsOpenDialog, updateIsRegister } = useUserContext();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { data: session } = useSession({
@@ -61,7 +53,7 @@ const LoginDialogContent: React.FC<Props> = ({ setIsRegister }) => {
           result?.error || "An unexpected error occurred. Please try again."
         );
       } else {
-        setopenDialog(!openDialog);
+        updateIsOpenDialog(false);
       }
     } catch (error) {
       console.error("An unexpected error occurred:", error);
@@ -72,59 +64,54 @@ const LoginDialogContent: React.FC<Props> = ({ setIsRegister }) => {
   };
 
   return (
-    <DialogContent className="sm:max-w-[425px]">
-      <DialogHeader>
-        <DialogTitle className="text-2xl font-bold">Login</DialogTitle>
-      </DialogHeader>
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-        <div className="flex flex-col gap-2">
-          <label htmlFor="email" className="font-medium text-sm">
-            Email
-          </label>
-          <input
-            id="email"
-            type="email"
-            placeholder="Type your email"
-            {...register("email")}
-            className="border border-gray-300 p-2 rounded text-black text-sm"
-          />
-          {errors.email && (
-            <span className="text-red-500">{errors.email.message}</span>
-          )}
-        </div>
-        <div className="flex flex-col gap-2">
-          <label htmlFor="password" className="font-medium text-sm">
-            Password
-          </label>
-          <input
-            id="password"
-            type="password"
-            placeholder="Type your password"
-            {...register("password")}
-            className="border border-gray-300 p-2 rounded text-black text-sm"
-          />
-          {errors.password && (
-            <span className="text-red-500">{errors.password.message}</span>
-          )}
-        </div>
-        <div className="flex flex-col items-center gap-2 mt-5">
-          <Button disabled={isLoading} type="submit" size="action">
-            {isLoading ? "Loading..." : "Login"}
-          </Button>
-          <p className="text-sm">
-            Don’t have an account?{" "}
-            <span
-              className="text-primary font-medium cursor-pointer"
-              onClick={() => setIsRegister(true)}
-            >
-              Create Account
-            </span>
-          </p>
-        </div>
+    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+      <div className="flex flex-col gap-2">
+        <label htmlFor="email" className="font-medium text-sm">
+          Email
+        </label>
+        <input
+          id="email"
+          type="email"
+          placeholder="Type your email"
+          {...register("email")}
+          className="border border-gray-300 p-2 rounded text-black text-sm"
+        />
+        {errors.email && (
+          <span className="text-red-500">{errors.email.message}</span>
+        )}
+      </div>
+      <div className="flex flex-col gap-2">
+        <label htmlFor="password" className="font-medium text-sm">
+          Password
+        </label>
+        <input
+          id="password"
+          type="password"
+          placeholder="Type your password"
+          {...register("password")}
+          className="border border-gray-300 p-2 rounded text-black text-sm"
+        />
+        {errors.password && (
+          <span className="text-red-500">{errors.password.message}</span>
+        )}
+      </div>
+      <div className="flex flex-col items-center gap-2 mt-5">
+        <Button disabled={isLoading} type="submit" size="action">
+          {isLoading ? "Loading..." : "Login"}
+        </Button>
+        <p className="text-sm">
+          Don’t have an account?{" "}
+          <span
+            className="text-primary font-medium cursor-pointer"
+            onClick={() => updateIsRegister(true)}
+          >
+            Create Account
+          </span>
+        </p>
+      </div>
 
-        {error && <span className="text-red-500">{error}</span>}
-      </form>
-    </DialogContent>
+      {error && <span className="text-red-500">{error}</span>}
+    </form>
   );
 };
 
