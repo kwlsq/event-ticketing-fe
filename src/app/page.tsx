@@ -57,9 +57,9 @@ export default function Home() {
           </SelectContent>
         </Select>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
         {events?.map((event) => (
-          <div key={event.id} className="w-[272px]">
+          <div key={event.id}>
             <EventCard
               name={event.name}
               date={event.date}
