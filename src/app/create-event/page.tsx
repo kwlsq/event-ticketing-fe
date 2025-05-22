@@ -6,7 +6,7 @@ export default function CreateEvent() {
   return (
     <div>
       <Input
-      placeholder="Event name"
+        placeholder="Event name"
       ></Input>
       <Select>
         <SelectTrigger>

@@ -19,7 +19,7 @@ export default function Home() {
   const { events, totalPages, setSort, sort } = useEvents();
 
   const handleSort = (value: string) => {
-    setSort(value);
+    setSort(value.toLowerCase());
   }
 
   return (
@@ -48,11 +48,11 @@ export default function Home() {
               <SelectLabel>
                 Sort by
               </SelectLabel>
-              <SelectItem value="name">Name</SelectItem>
-              <SelectItem value="venue">Venue</SelectItem>
-              <SelectItem value="location">Location</SelectItem>
-              <SelectItem value="date">Date</SelectItem>
-              <SelectItem value="id">Default</SelectItem>
+              <SelectItem value="Name">Name</SelectItem>
+              <SelectItem value="Venue">Venue</SelectItem>
+              <SelectItem value="Location">Location</SelectItem>
+              <SelectItem value="Date">Date</SelectItem>
+              <SelectItem value="Id">Default</SelectItem>
             </SelectGroup>
           </SelectContent>
         </Select>

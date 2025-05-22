@@ -48,10 +48,10 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
       }
     }
     fetchEventData();
-  }, [page, sort])
+  }, [page, sort, totalPages])
 
   return (
-    <EventContext.Provider value={{events, loading, error, selectedEvent, setSelectedEvent, totalPages, setTotalPages, page, setPage, sort, setSort}}>
+    <EventContext.Provider value={{ events, loading, error, selectedEvent, setSelectedEvent, totalPages, setTotalPages, page, setPage, sort, setSort }}>
       {children}
     </EventContext.Provider>
   )
