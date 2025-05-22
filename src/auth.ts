@@ -28,7 +28,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 }
 
                 const { data } = (await response.json()) as LoginResponse;
-                console.log(data)
 
                 //verify jwt signature
                 const secret = process.env.JWT_SECRET;
