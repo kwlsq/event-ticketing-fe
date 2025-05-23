@@ -15,6 +15,7 @@ export interface TokenClaims extends JwtPayload {
   userId: string;
   scope: string;
   name: string;
+  email: string;
 }
 
 export interface LoginResponse {
