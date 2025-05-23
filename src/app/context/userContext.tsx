@@ -35,7 +35,6 @@ export const UserProvider: FC<{ children: ReactNode }> = ({ children }) => {
   };
 
   const updateIsOpenPopOver = (val: boolean) => {
-    console.log(val)
     setIsOpenPopOver(val);
   };
 

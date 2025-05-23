@@ -1,6 +1,9 @@
+import { logout } from "@/app/services/userService";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent } from "@/components/ui/popover";
+import { TokenPair } from "@/types/auth/TokenPair";
 import { PopoverTrigger } from "@radix-ui/react-popover";
+import { signOut } from "next-auth/react";
 import Image from "next/image";
 
 interface Props {
@@ -11,12 +14,27 @@ interface Props {
     name: string;
     email: string;
   };
+  session: TokenPair;
 }
+
+const handleLogout = async (
+  data: TokenPair,
+  setOpenPopOver: (val: boolean) => void
+) => {
+  try {
+    await logout(data);
+    signOut();
+    setOpenPopOver(false);
+  } catch (error) {
+    console.error(error);
+  }
+};
 
 const ProfilePopOver: React.FC<Props> = ({
   open,
   setOpenPopOver,
   userDetail,
+  session,
 }) => {
   return (
     <Popover open={open} onOpenChange={setOpenPopOver}>
@@ -56,7 +74,13 @@ const ProfilePopOver: React.FC<Props> = ({
             <div className="font-semibold">5.800 Points</div>
           </div>
         </div>
-        <Button variant="text" className="mt-5 p-0 text-destructive">Logout</Button>
+        <Button
+          variant="text"
+          className="mt-5 p-0 text-destructive"
+          onClick={() => handleLogout(session, setOpenPopOver)}
+        >
+          Logout
+        </Button>
       </PopoverContent>
     </Popover>
   );

@@ -26,8 +26,6 @@ const Navbar = () => {
     nameInitial: "",
   });
 
-  console.log(session);
-
   useEffect(() => {
     if (session?.accessToken) {
       const accessTokenDecoded = jwtDecode<TokenClaims>(session.accessToken);
@@ -42,7 +40,7 @@ const Navbar = () => {
     updateIsOpenDialog(true);
     updateIsRegister(val);
   };
-  console.log(userDetail);
+
   return (
     <div className="flex justify-between py-3 border-b-2 px-[100px]">
       <Link href={"/"}>
@@ -63,6 +61,7 @@ const Navbar = () => {
             open={isOpenPopOver}
             setOpenPopOver={updateIsOpenPopOver}
             userDetail={userDetail}
+            session={session}
           ></ProfilePopOver>
         ) : (
           <>
