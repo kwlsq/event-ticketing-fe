@@ -47,14 +47,13 @@ const LoginDialogContent = () => {
         email: data.email,
         password: data.password,
       });
-      console.log(result);
-      if (!result?.ok) {
-        setError(
-          result?.error || "An unexpected error occurred. Please try again."
-        );
-      } else {
-        updateIsOpenDialog(false);
+
+      if (result?.error || !result?.ok) {
+        setError("Invalid email or password");
+        return;
       }
+
+      updateIsOpenDialog(false);
     } catch (error) {
       console.error("An unexpected error occurred:", error);
       setError("An unexpected error occurred. Please try again.");
@@ -110,7 +109,7 @@ const LoginDialogContent = () => {
         </p>
       </div>
 
-      {error && <span className="text-red-500">{error}</span>}
+      {error && <span className="text-red-500 text-center">{error}</span>}
     </form>
   );
 };

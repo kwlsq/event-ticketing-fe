@@ -17,6 +17,7 @@ const Navbar = () => {
     updateIsRegister,
     isOpenPopOver,
     updateIsOpenPopOver,
+    isOrganizer,
   } = useUserContext();
 
   const { data: session } = useSession();
@@ -28,6 +29,7 @@ const Navbar = () => {
 
   useEffect(() => {
     if (session?.accessToken) {
+      console.log(session);
       const accessTokenDecoded = jwtDecode<TokenClaims>(session.accessToken);
       const name = accessTokenDecoded.name;
       const email = accessTokenDecoded.email;
@@ -52,9 +54,11 @@ const Navbar = () => {
         />
       </Link>
       <div className="flex items-center gap-5">
-        <Link href={"/organizer"} className="font-semibold mr-10 text-sm">
-          Create Event
-        </Link>
+        {isOrganizer(session?.user.roles[0]) ? (
+          <Link href={"/organizer"} className="font-semibold mr-10 text-sm">
+            Create Event
+          </Link>
+        ) : null}
 
         {session ? (
           <ProfilePopOver

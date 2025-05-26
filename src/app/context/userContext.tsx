@@ -1,5 +1,6 @@
 "use client";
 
+import { ROLE } from "@/constants/userConstants";
 import { createContext, FC, ReactNode, useContext, useState } from "react";
 
 interface UserContextType {
@@ -9,6 +10,7 @@ interface UserContextType {
   updateIsOpenDialog: (val: boolean) => void;
   updateIsRegister: (val: boolean) => void;
   updateIsOpenPopOver: (val: boolean) => void;
+  isOrganizer: (val: string | undefined) => boolean;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -38,6 +40,13 @@ export const UserProvider: FC<{ children: ReactNode }> = ({ children }) => {
     setIsOpenPopOver(val);
   };
 
+  const isOrganizer = (role: string | undefined) => {
+    if (role?.split("_")[1] === ROLE.ORGANIZER) {
+      return true;
+    }
+    return false;
+  };
+
   return (
     <UserContext.Provider
       value={{
@@ -47,6 +56,7 @@ export const UserProvider: FC<{ children: ReactNode }> = ({ children }) => {
         updateIsRegister,
         isOpenPopOver,
         updateIsOpenPopOver,
+        isOrganizer,
       }}
     >
       {children}
