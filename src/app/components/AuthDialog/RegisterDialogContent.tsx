@@ -1,11 +1,14 @@
+"use client";
+
 import { registerUser } from "@/app/services/userService";
 import { Button } from "@/components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { useParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useUserContext } from "@/app/context/userContext";
+import { toast } from "sonner";
 
 const formSchema = z.object({
   name: z.string().nonempty(),
@@ -27,9 +30,9 @@ const RegisterDialogContent = () => {
   } = useForm<FormData>({
     resolver: zodResolver(formSchema),
   });
-  const params = useParams();
+  const pathname = usePathname();
 
-  const registrationType = params.type === "organizer" ? "organizer" : "user";
+  const registrationType = pathname === "/create-event" ? "organizer" : "user";
 
   const onSubmit = async (data: FormData) => {
     setError(null);
@@ -42,8 +45,10 @@ const RegisterDialogContent = () => {
         code: data.referralCode,
       });
       setIsLoading(false);
+      toast.success("Registration successful!");
       updateIsOpenDialog(false);
     } catch (err) {
+      toast.error("Something went wrong!");
       console.error("Error:", err);
     }
   };

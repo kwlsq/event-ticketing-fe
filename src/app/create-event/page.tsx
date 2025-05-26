@@ -1,22 +1,31 @@
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Input } from "@/components/ui/input"
+"use client";
+
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { useSession } from "next-auth/react";
+import NewOrganizerView from "./NewOrganizerView";
 
 export default function CreateEvent() {
+  const { data: session } = useSession();
 
-  return (
+  return session ? (
     <div>
-      <Input
-      placeholder="Event name"
-      ></Input>
+      <Input placeholder="Event name"></Input>
       <Select>
         <SelectTrigger>
           <SelectValue placeholder="Select a category" />
         </SelectTrigger>
         <SelectContent>
           <SelectGroup>
-            <SelectLabel>
-              Category
-            </SelectLabel>
+            <SelectLabel>Category</SelectLabel>
             <SelectItem value="Music">Music</SelectItem>
             <SelectItem value="Art">Art</SelectItem>
             <SelectItem value="Workshop">Workshop</SelectItem>
@@ -26,5 +35,7 @@ export default function CreateEvent() {
         </SelectContent>
       </Select>
     </div>
-  )
+  ) : (
+    <NewOrganizerView></NewOrganizerView>
+  );
 }
