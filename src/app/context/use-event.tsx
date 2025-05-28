@@ -3,8 +3,8 @@
 import axios from "axios";
 import { createContext, useContext, useEffect, useState } from "react";
 import { ReactNode } from "react";
-import { EventProps } from "@/types/event/event";
-import { EventDetailsProps } from "@/types/event/even-details";
+import { EventProps, EventRequest } from "@/types/event/event";
+import { EventDetailsProps } from "@/types/event/event";
 import { API_URL } from "@/constants/url";
 
 
@@ -13,13 +13,20 @@ interface EventContextType {
   loading: boolean,
   error: unknown,
   selectedEvent: EventDetailsProps | null,
-  setSelectedEvent: (selectedEvent: EventDetailsProps | null) => void,
   totalPages: number,
-  setTotalPages: (totalPages: number) => void,
   page: number,
-  setPage: (page: number) => void
   sort: string,
-  setSort: (sort: string) => void
+  query: string,
+  totalElements: number,
+
+  setSelectedEvent: (selectedEvent: EventDetailsProps | null) => void,
+  setTotalPages: (totalPages: number) => void,
+  setPage: (page: number) => void,
+  setSort: (sort: string) => void,
+  setQuery: (query: string) => void,
+  setTotalElements: (totalElements: number) => void,
+  
+  createEvent: (newEvent: EventRequest) => Promise<void>
 }
 
 const EventContext = createContext<EventContextType | undefined>(undefined);
@@ -32,13 +39,16 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
   const [totalPages, setTotalPages] = useState(0);
   const [page, setPage] = useState(0);
   const [sort, setSort] = useState('id');
+  const [query, setQuery] = useState('');
+  const [totalElements, setTotalElements] = useState(0);
 
   useEffect(() => {
     const fetchEventData = async () => {
       try {
-        const response = await axios.get(`${API_URL.BASE_URL_LOCAL}${API_URL.endpoints.event}?page=${page}&size=4&sort=${sort}`);
+        const response = await axios.get(`${API_URL.BASE_URL_LOCAL}${API_URL.endpoints.event}?page=${page}&size=4&sort=${sort}&search=${query}`);
         const events: EventProps[] = response.data.data.content;
         setTotalPages(response.data.data.totalPages);
+        setTotalElements(response.data.data.totalElements);
         console.log(totalPages);
         setEvents(events);
         setLoading(false);
@@ -48,10 +58,20 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
       }
     }
     fetchEventData();
-  }, [page, sort, totalPages])
+  }, [page, sort, totalPages, query]);
+
+  const createEvent = async (newEvent: EventRequest) => {
+    try {
+      const response = await axios.post(`${API_URL.BASE_URL_LOCAL}${API_URL.endpoints.event}`, newEvent);
+      const createdEvent = response.data.data;
+      setEvents(prev => [createdEvent, ...prev]);
+    } catch (error) {
+      setError(error);
+    }
+  };
 
   return (
-    <EventContext.Provider value={{ events, loading, error, selectedEvent, setSelectedEvent, totalPages, setTotalPages, page, setPage, sort, setSort }}>
+    <EventContext.Provider value={{ events, loading, error, selectedEvent, setSelectedEvent, totalPages, setTotalPages, page, setPage, sort, setSort, query, setQuery, totalElements, setTotalElements, createEvent}}>
       {children}
     </EventContext.Provider>
   )

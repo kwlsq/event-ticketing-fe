@@ -33,7 +33,7 @@ const EventCard : FC<EventProps> = ({name, date, venue, location, startingPrice}
   const formattedTime = new Intl.DateTimeFormat('en-GB', {hour: '2-digit', minute:'2-digit', hour12:false}).format(dateTimestamp);
 
   return (
-    <Card className="shadow-none border-none p-0 max-w-[295px]">
+    <Card className="shadow-none border-none p-0 w-full">
       <CardHeader className="p-0 gap-0">
         <Image
           src= {"https://res.cloudinary.com/ddk6cxc7c/image/upload/v1/purwafest_event/r7qqtw8d6rdieoxgyhmm"}
