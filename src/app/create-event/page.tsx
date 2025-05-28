@@ -9,6 +9,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import EventTicketTypeCard from '../components/Event Ticket Type/index';
 import { useEffect } from "react"
+import { useSession } from "next-auth/react";
+import NewOrganizerView from "./NewOrganizerView";
 
 const ticketTypeSchema = z.object({
   name: z.string(),
@@ -37,6 +39,7 @@ const eventFormSchema = z.object({
 export type EventForm = z.infer<typeof eventFormSchema>;
 
 export default function CreateEvent() {
+  const { data: session } = useSession();
 
   const { register, control, handleSubmit, watch, setValue, formState: { errors }, } = useForm<EventForm>({
     resolver: zodResolver(eventFormSchema),
@@ -68,7 +71,7 @@ export default function CreateEvent() {
     console.log("Form submitted: ", data);
   };
 
-  return (
+  return session ? (
     <form
       className="w-full flex gap-4 px-24"
       onSubmit={handleSubmit(onSubmit)}
@@ -234,5 +237,7 @@ export default function CreateEvent() {
         <Button type="submit">Submit</Button>
       </div>
     </form>
-  )
+  ) : (
+    <NewOrganizerView></NewOrganizerView>
+  );
 }

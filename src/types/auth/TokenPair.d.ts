@@ -1,8 +1,8 @@
 import { JwtPayload } from "jwt-decode";
 
 export interface TokenPair {
-  accessToken: Token;
-  refreshToken: Token;
+  accessToken: string;
+  refreshToken: string;
 }
 
 export interface Token {
@@ -15,6 +15,7 @@ export interface TokenClaims extends JwtPayload {
   userId: string;
   scope: string;
   name: string;
+  email: string;
 }
 
 export interface LoginResponse {

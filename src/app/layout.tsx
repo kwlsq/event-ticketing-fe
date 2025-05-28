@@ -5,6 +5,7 @@ import { SessionProvider } from "next-auth/react";
 import { auth } from "@/auth";
 import { EventProvider } from "./context/use-event";
 import { UserProvider } from "./context/userContext";
+import { Toaster } from "sonner";
 
 const plusJakarta = Plus_Jakarta_Sans({
   variable: "--font-jakarta",
@@ -28,6 +29,7 @@ export default async function RootLayout({
         <body className={`${plusJakarta.className} antialiased`}>
           <UserProvider>
             <EventProvider>{children}</EventProvider>
+            <Toaster />
           </UserProvider>
         </body>
       </SessionProvider>

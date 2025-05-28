@@ -4,10 +4,10 @@ import { auth } from "@/auth";
 
 const PUBLIC_PATHS = ["*"];
 const ROLE_PATHS = {
-    organizer: ["/organizer", "/organizer/*"],
-    user: ["/user", "/user/*"],
+  organizer: ["/organizer", "/organizer/*"],
+  user: ["/user", "/user/*"],
 };
-const PROTECTED_PATHS = [...ROLE_PATHS.organizer,...ROLE_PATHS.user, "/transaction"];
+const PROTECTED_PATHS = [...ROLE_PATHS.organizer, ...ROLE_PATHS.user, "/transaction"];
 
 async function getSession() {
   return await auth();
@@ -43,7 +43,7 @@ export async function middleware(request: NextRequest) {
 
   if (isProtectedPath(pathname)) {
     if (!session) {
-      return NextResponse.redirect(new URL("/login", request.url));
+      return NextResponse.redirect(new URL("/?login=true", request.url));
     }
 
     const userRoles = session.user?.roles || [];

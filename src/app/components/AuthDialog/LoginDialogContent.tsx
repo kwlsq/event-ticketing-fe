@@ -5,6 +5,7 @@ import { z } from "zod";
 import { signIn, useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { useUserContext } from "@/app/context/userContext";
+import { toast } from "sonner";
 
 const formSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -47,16 +48,18 @@ const LoginDialogContent = () => {
         email: data.email,
         password: data.password,
       });
-      console.log(result);
-      if (!result?.ok) {
-        setError(
-          result?.error || "An unexpected error occurred. Please try again."
-        );
-      } else {
-        updateIsOpenDialog(false);
+
+      if (result?.error || !result?.ok) {
+        toast.error("Invalid email or password");
+        return;
       }
+      toast.success("Login successful!");
+
+      updateIsOpenDialog(false);
     } catch (error) {
       console.error("An unexpected error occurred:", error);
+      toast.error("An unexpected error occurred");
+
       setError("An unexpected error occurred. Please try again.");
     } finally {
       setIsLoading(false);
@@ -110,7 +113,7 @@ const LoginDialogContent = () => {
         </p>
       </div>
 
-      {error && <span className="text-red-500">{error}</span>}
+      {error && <span className="text-red-500 text-center">{error}</span>}
     </form>
   );
 };
