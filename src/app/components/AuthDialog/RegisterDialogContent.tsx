@@ -101,23 +101,24 @@ const RegisterDialogContent = () => {
           <span className="text-red-500">{errors.password.message}</span>
         )}
       </div>
-
-      <div className="flex flex-col gap-2">
-        <label htmlFor="referralCode" className="font-medium text-sm">
-          Referral code (optional)
-        </label>
-        <input
-          id="referralCode"
-          type="referralCode"
-          placeholder="Type your referral code"
-          maxLength={8}
-          {...register("referralCode")}
-          className="border border-gray-300 p-2 rounded text-black text-sm"
-        />
-        {errors.referralCode && (
-          <span className="text-red-500">{errors.referralCode.message}</span>
-        )}
-      </div>
+      {registrationType === "organizer" ? null : (
+        <div className="flex flex-col gap-2">
+          <label htmlFor="referralCode" className="font-medium text-sm">
+            Referral code (optional)
+          </label>
+          <input
+            id="referralCode"
+            type="referralCode"
+            placeholder="Type your referral code"
+            maxLength={8}
+            {...register("referralCode")}
+            className="border border-gray-300 p-2 rounded text-black text-sm"
+          />
+          {errors.referralCode && (
+            <span className="text-red-500">{errors.referralCode.message}</span>
+          )}
+        </div>
+      )}
 
       <div className="flex flex-col items-center gap-2 mt-5">
         <Button disabled={isLoading} type="submit" size="action">
