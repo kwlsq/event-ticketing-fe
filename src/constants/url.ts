@@ -17,4 +17,7 @@ export const API_URL = {
     detail: "/api/v1/user",
     register: "/api/v1/user/register"
   },
+  points:{
+    totalPoints: "/api/v1/point"
+  }
 };
