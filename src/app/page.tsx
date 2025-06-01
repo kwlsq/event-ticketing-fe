@@ -39,7 +39,7 @@ const debounce = <T extends (...args: any[]) => void>(
 }
 
 export default function Home() {
-  const { events, totalPages, setSort, sort, query, setQuery, totalElements, setPage } = useEvents();
+  const { events, totalPages, setSort, sort, query, setQuery, totalElements, setPage, regencies, location, setLocation } = useEvents();
   const [searchQuery, setSearchQuery] = useState(query);
 
   const handleSort = (value: string) => {
@@ -57,17 +57,49 @@ export default function Home() {
     debouncedSetQuery(value);
   }
 
+  const handleLocationFilter = (location: string) => {
+    if (location === "__all__") {
+      setLocation("");
+    }
+
+    console.log(location);
+    setLocation(location);
+  }
+
   return (
     <div>
       <Navbar />
       <div className="mx-[100px] flex flex-col gap-9 mt-5">
-        <Input
-          type="text"
-          placeholder="Search event"
-          onChange={handleChange}
-          value={searchQuery}
-          className="bg-[#F2F6FF] border-none h-12 rounded-full"
-        />
+        <div className="flex gap-4 items-center">
+          <Input
+            type="text"
+            placeholder="Search event"
+            onChange={handleChange}
+            value={searchQuery}
+            className="bg-[#F2F6FF] border-none h-12 rounded-full w-full"
+          />
+          <div className={cn("flex gap-3.5 w-2xs justify-end", sort !== "id" ? "text-neutral-600" : "text-neutral-400")}>
+            <Select onValueChange={handleLocationFilter} value={location}>
+              <SelectTrigger className={cn("rounded-full border-none shadow-none", location !== "" && "border-neutral-600")}>
+                <SelectValue
+                >{location === "" ? "All locations" : location}</SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>Location</SelectLabel>
+                    <SelectItem value={"__all__"}>
+                      All locations
+                    </SelectItem>
+                  {regencies.map((regency) => (
+                    <SelectItem key={regency.code} value={regency.name}>
+                      {regency.name}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
 
         {/* Filter button & title */}
         <div className="flex justify-end w-full items-end">
@@ -75,7 +107,7 @@ export default function Home() {
             ?
             <h2
               className="text-2xl font-semibold w-full"
-            >Showing events in Indonesia 
+            >Showing events in Indonesia
             </h2>
             :
 
@@ -119,14 +151,15 @@ export default function Home() {
                 date={event.date}
                 venue={event.venue}
                 location={event.location}
-                time={900}
                 startingPrice={event.startingPrice}
+                id={event.id}
+                isEventFree={event.isEventFree}
               />
             </div>
           ))}
         </div>
         {/* Event pagination */}
-        <DynamicPagination totalPages={totalPages} setPages={setPage}/>
+        <DynamicPagination totalPages={totalPages} setPages={setPage} />
       </div>
     </div>
   );

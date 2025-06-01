@@ -19,8 +19,9 @@ const DatePicker = ({ value, onChange }: DatePickerProps) => {
       <PopoverTrigger asChild>
         <Button
           variant={"outline"}
+          size={"action"}
           className={cn(
-            "w-[240px] justify-start text-left font-normal",
+            "w-full justify-start text-left font-normal px-3",
             !value && "text-muted-foreground"
           )}
         >

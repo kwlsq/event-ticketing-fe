@@ -5,7 +5,8 @@ export const API_URL = {
     BASE_URL_LOCAL:
     process.env.NEXT_PUBLIC_BACKEND_URL,
   endpoints: {
-    event: '/event/public'
+    event: '/api/v1/event/public',
+    image: '/api/v1/image'
   },
   auth: {
     login: "/api/v1/auth/login",
