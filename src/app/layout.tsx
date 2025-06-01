@@ -6,6 +6,7 @@ import { auth } from "@/auth";
 import { EventProvider } from "./context/use-event";
 import { UserProvider } from "./context/userContext";
 import { Toaster } from "sonner";
+import { PointsProvider } from "./context/pointsContext";
 
 const plusJakarta = Plus_Jakarta_Sans({
   variable: "--font-jakarta",
@@ -28,8 +29,10 @@ export default async function RootLayout({
       <SessionProvider refetchInterval={120} session={session}>
         <body className={`${plusJakarta.className} antialiased`}>
           <UserProvider>
-            <EventProvider>{children}</EventProvider>
-            <Toaster />
+            <PointsProvider>
+              <EventProvider>{children}</EventProvider>
+              <Toaster />
+            </PointsProvider>
           </UserProvider>
         </body>
       </SessionProvider>
