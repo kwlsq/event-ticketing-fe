@@ -64,6 +64,8 @@ const Navbar = () => {
         <Image
           height={40}
           width={40}
+          style={{ width: "100%", height: "auto" }}
+          priority
           src="/purwadhika.webp"
           alt="purwafest logo"
         />
