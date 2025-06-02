@@ -8,7 +8,8 @@ export interface EventProps {
   venue: string,
   location: string,
   isEventFree: boolean,
-  startingPrice: number
+  startingPrice: number,
+  thumbnailUrl?: string
 }
 
 export interface EventTicketType {
@@ -41,10 +42,10 @@ export interface EventTicketTypeRequest {
 export interface EventRequest {
   name: string,
   description: string,
-  date: string,
+  date: Date,
   venue: string,
   location: string,
   isEventFree: boolean,
-  ticketSaleDate: string,
-  ticketTypeRequest: EventTicketTypeRequest[]
+  ticketSaleDate: Date,
+  ticketTypeRequest: EventTicketTypeRequest[] 
 }

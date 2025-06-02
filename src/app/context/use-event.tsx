@@ -35,7 +35,7 @@ interface EventContextType {
   setRegencies: (regencies: LocationProps[]) => void,
   setLocation: (location: string) => void
 
-  createEvent: (newEvent: EventRequest) => Promise<void>
+  createEvent: (newEvent: EventRequest, accessToken: string) => Promise<EventDetailsProps | undefined>
 }
 
 const EventContext = createContext<EventContextType | undefined>(undefined);
@@ -59,10 +59,10 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const fetchEventData = async () => {
       try {
-        const response = await axios.get(`${API_URL.BASE_URL_LOCAL}${API_URL.endpoints.event}`, {
+        const response = await axios.get(`${API_URL.BASE_URL_LOCAL}${API_URL.endpoints.eventPublic}`, {
           params: {
             page: page,
-            size: 4,
+            size: 12,
             sort: sort,
             search: query,
             location: location
@@ -97,8 +97,8 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
         setRegencies(response.data.data);
 
         localStorage.setItem("regenciesData", JSON.stringify(response.data.data));
-      } catch (error: any) {
-        setError(error.message || "Something went wrong");
+      } catch (error: unknown) {
+        setError(error);
       }
     };
     fetchRegencies();
@@ -108,27 +108,41 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const fetchEventDetails = async () => {
       try {
-        const response = await axios.get(`${API_URL.BASE_URL_LOCAL}${API_URL.endpoints.event}/${selectedEventID}`);
-        setSelectedEvent(response.data);
-      } catch (error: any) {
-        setError(error.message || "Something went wrong");
+        const response = await axios.get(`${API_URL.BASE_URL_LOCAL}${API_URL.endpoints.eventPublic}/${selectedEventID}`);
+        setSelectedEvent(response.data.data);
+      } catch (error: unknown) {
+        setError(error);
       }
     };
     fetchEventDetails();
   }, [selectedEventID]);
 
-  const createEvent = async (newEvent: EventRequest) => {
+  const createEvent = async (newEvent: EventRequest, accessToken: string): Promise<EventDetailsProps | undefined> => {
     try {
-      const response = await axios.post(`${API_URL.BASE_URL_LOCAL}${API_URL.endpoints.event}`, newEvent);
-      const createdEvent = response.data.data;
-      setEvents(prev => [createdEvent, ...prev]);
+      const response = await axios.post(`${API_URL.BASE_URL_LOCAL}${API_URL.endpoints.event}/create`, newEvent, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`
+        }
+      });
+      const createdEvent: EventDetailsProps = response.data.data;
+
+      setEvents(prev => [{
+        id: createdEvent.id,
+        name: createdEvent.name,
+        date: createdEvent.date,
+        venue: createdEvent.venue,
+        location: createdEvent.location,
+        isEventFree: newEvent.isEventFree,
+        startingPrice: newEvent.ticketTypeRequest[0]?.price || 0
+      }, ...prev]);
+      return createdEvent;
     } catch (error) {
       setError(error);
     }
   };
 
   return (
-    <EventContext.Provider value={{ events, loading, error, selectedEvent, setSelectedEvent, totalPages, setTotalPages, page, setPage, sort, setSort, query, setQuery, totalElements, setTotalElements, createEvent, regencies, setRegencies, selectedEventID, setSelectedEventID, location, setLocation }}>
+    <EventContext.Provider value={{ events, loading, error, selectedEvent, setSelectedEvent, totalPages, setTotalPages, page, setPage, sort, setSort, query, setQuery, totalElements, setTotalElements, regencies, setRegencies, selectedEventID, setSelectedEventID, location, setLocation, createEvent }}>
       {children}
     </EventContext.Provider>
   )

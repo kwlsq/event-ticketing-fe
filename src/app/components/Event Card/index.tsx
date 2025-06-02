@@ -15,7 +15,7 @@ import { FC } from "react";
 import { useEvents } from "@/app/context/use-event";
 import { useRouter } from "next/navigation";
 
-const EventCard : FC<EventProps> = ({name, date, venue, location, startingPrice, id}) => {
+const EventCard : FC<EventProps> = ({name, date, venue, location, startingPrice, id, thumbnailUrl}) => {
 
   const {setSelectedEventID} = useEvents();
   const router = useRouter();
@@ -43,7 +43,7 @@ const EventCard : FC<EventProps> = ({name, date, venue, location, startingPrice,
     >
       <CardHeader className="p-0 gap-0">
         <Image
-          src= {"https://res.cloudinary.com/ddk6cxc7c/image/upload/v1/purwafest_event/r7qqtw8d6rdieoxgyhmm"}
+          src= {thumbnailUrl || "https://placehold.co/295x200.png"}
           alt="event image"
           className="rounded-2xl"
           quality={100}

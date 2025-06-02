@@ -38,7 +38,8 @@ const eventFormSchema = z.object({
     return date >= today;
   }, { message: "Date cannot be in the past!" }),
   isEventFree: z.boolean(),
-  ticketTypeRequest: z.array(ticketTypeSchema).optional()
+  location: z.string(),
+  ticketTypeRequest: z.array(ticketTypeSchema)
 });
 
 export type EventForm = z.infer<typeof eventFormSchema>;
@@ -54,7 +55,7 @@ export default function CreateEvent() {
     }
   });
 
-  const { regencies } = useEvents();
+  const { regencies, createEvent } = useEvents();
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -79,29 +80,49 @@ export default function CreateEvent() {
     try {
       let imageUploadResponse = null;
 
-      if (files) {
-        const formData = new FormData();
+      const formData = new FormData();
+
+      if (!session || !session.accessToken) {
+        console.error("Authentication error!");
+        return;
+      }
+
+      if (files && files.length > 0) {
         for (let i = 0; i < files.length; i++) {
-          formData.append('multipartFiles', files[i]);
+          formData.append("multipartFiles", files[i]);
         }
 
-        const res = await axios.post(`${API_URL.BASE_URL_LOCAL}${API_URL.endpoints.image}`, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data'
+        // create event first
+        const createdEvent = await createEvent(data, session?.accessToken);
+
+        console.log(createdEvent);
+
+        if (createdEvent === undefined) {
+          return null;
+        }
+
+        const res = await axios.post(
+          `${API_URL.BASE_URL_LOCAL}${API_URL.endpoints.image}/${createdEvent.id}`,
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+              Authorization: `Bearer ${session.accessToken}`,
+            },
           }
-        });
+        );
 
         imageUploadResponse = res.data;
+        console.log(imageUploadResponse);
 
       }
 
-      // Now send event data along with image info (if any) to your backend
-      console.log('Event data: ', data);
-      console.log('Image upload response: ', imageUploadResponse);
+      // Send event + image data to your own event creation endpoint here (if needed)
+      console.log("Event form data:", data);
+      console.log("Uploaded image URLs:", imageUploadResponse.url);
 
-      // You can call another backend endpoint to save the full event (including image URL)
     } catch (err) {
-      console.error(err);
+      console.error("Upload failed:", err);
     }
   };
 
@@ -210,23 +231,32 @@ export default function CreateEvent() {
                   Location <span className="text-red-500">*</span>
                 </label>
                 <div className="flex flex-col gap-1">
-                  <Select>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select location" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        <SelectLabel>
-                          Location
-                        </SelectLabel>
-                        {regencies.map((regency) => (
-                          <SelectItem key={regency.code} value={regency.name}>
-                            {regency.name}
-                          </SelectItem>
-                        ))}
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
+                  <Controller
+                    control={control}
+                    name="location"
+                    render={({ field }) => (
+                      <Select
+                        value={field.value}
+                        onValueChange={field.onChange}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select location" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectGroup>
+                            <SelectLabel>
+                              Location
+                            </SelectLabel>
+                            {regencies.map((regency) => (
+                              <SelectItem key={regency.code} value={regency.name}>
+                                {regency.name}
+                              </SelectItem>
+                            ))}
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
                 </div>
               </div>
             </div>
