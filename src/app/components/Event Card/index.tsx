@@ -1,3 +1,5 @@
+"use client"
+
 import {
   Card,
   CardTitle,
@@ -8,18 +10,20 @@ import {
 } from "@/components/ui/card";
 
 import Image from "next/image";
+import { EventProps } from "@/types/event/event";
 import { FC } from "react";
+import { useEvents } from "@/app/context/use-event";
+import { useRouter } from "next/navigation";
 
-interface EventProps {
-  name: string,
-  date: string,
-  time: number,
-  venue: string,
-  location: string,
-  startingPrice: number
-}
+const EventCard : FC<EventProps> = ({name, date, venue, location, startingPrice, id, thumbnailUrl}) => {
 
-const EventCard : FC<EventProps> = ({name, date, venue, location, startingPrice}) => {
+  const {setSelectedEventID} = useEvents();
+  const router = useRouter();
+
+  const handleClickCard = (eventID: number) => {
+    setSelectedEventID(eventID);
+    router.push(`/event-details/${eventID}`)
+  }
 
   const dateTimestamp = new Date(date);
 
@@ -33,10 +37,13 @@ const EventCard : FC<EventProps> = ({name, date, venue, location, startingPrice}
   const formattedTime = new Intl.DateTimeFormat('en-GB', {hour: '2-digit', minute:'2-digit', hour12:false}).format(dateTimestamp);
 
   return (
-    <Card className="shadow-none border-none p-0 max-w-[295px]">
+    <Card
+    className="shadow-none border-none p-0 w-full"
+    onClick={() => {handleClickCard(id)}}
+    >
       <CardHeader className="p-0 gap-0">
         <Image
-          src= {"https://res.cloudinary.com/ddk6cxc7c/image/upload/v1/purwafest_event/r7qqtw8d6rdieoxgyhmm"}
+          src= {thumbnailUrl || "https://placehold.co/295x200.png"}
           alt="event image"
           className="rounded-2xl"
           quality={100}
