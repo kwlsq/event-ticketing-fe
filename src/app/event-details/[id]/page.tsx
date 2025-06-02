@@ -18,7 +18,7 @@ const EventDetailPage = () => {
 
   useEffect(() => {
     setSelectedEventID(parseInt(eventID.split("/")[2]));
-  }, [eventID])
+  }, [eventID, setSelectedEventID])
 
   return (
     <div className='px-80'>

@@ -27,6 +27,7 @@ const sortLabels: Record<string, string> = {
   id: "Sort by",
 };
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 const debounce = <T extends (...args: any[]) => void>(
   func: T,
   delay: number

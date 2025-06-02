@@ -119,11 +119,13 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
 
   const createEvent = async (newEvent: EventRequest, accessToken: string): Promise<EventDetailsProps | undefined> => {
     try {
+
       const response = await axios.post(`${API_URL.BASE_URL_LOCAL}${API_URL.endpoints.event}/create`, newEvent, {
         headers: {
           Authorization: `Bearer ${accessToken}`
         }
       });
+      
       const createdEvent: EventDetailsProps = response.data.data;
 
       setEvents(prev => [{
@@ -135,6 +137,9 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
         isEventFree: newEvent.isEventFree,
         startingPrice: newEvent.ticketTypeRequest[0]?.price || 0
       }, ...prev]);
+
+      // delete cached created event after successfully create event
+      localStorage.removeItem("cachedCreatedEvent");
       return createdEvent;
     } catch (error) {
       setError(error);
