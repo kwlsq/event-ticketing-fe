@@ -24,10 +24,12 @@ const Navbar = () => {
   } = useUserContext();
 
   const { data: session } = useSession();
+  console.log(session);
   const [userDetail, setUserDetail] = useState({
     name: "",
     email: "",
     nameInitial: "",
+    role: "",
   });
 
   const searchParams = useSearchParams();
@@ -40,7 +42,8 @@ const Navbar = () => {
       const name = accessTokenDecoded.name;
       const email = accessTokenDecoded.email;
       const nameInitial = name?.charAt(0) ?? "";
-      setUserDetail({ name, email, nameInitial });
+      const role = session.user.roles[0].split("_")[1];
+      setUserDetail({ name, email, nameInitial, role });
     }
   }, [session]);
 
