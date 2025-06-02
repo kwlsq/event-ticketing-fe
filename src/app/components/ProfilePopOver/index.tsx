@@ -1,3 +1,6 @@
+"use client";
+
+import { usePointsContext } from "@/app/context/pointsContext";
 import { logout } from "@/app/services/userService";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent } from "@/components/ui/popover";
@@ -36,6 +39,7 @@ const ProfilePopOver: React.FC<Props> = ({
   userDetail,
   session,
 }) => {
+  const { totalPoints } = usePointsContext();
   return (
     <Popover open={open} onOpenChange={setOpenPopOver}>
       <PopoverTrigger>
@@ -71,7 +75,9 @@ const ProfilePopOver: React.FC<Props> = ({
                 width={20}
               />
             </div>
-            <div className="font-semibold">5.800 Points</div>
+            <div className="font-semibold">
+              {totalPoints.toLocaleString("id-ID")} Points
+            </div>
           </div>
         </div>
         <Button

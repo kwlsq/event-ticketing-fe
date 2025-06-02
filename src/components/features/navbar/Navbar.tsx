@@ -10,7 +10,7 @@ import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 const Navbar = () => {
   const {
@@ -44,16 +44,19 @@ const Navbar = () => {
     }
   }, [session]);
 
-  const handleClickOpenDialog = (val: boolean) => {
-    updateIsOpenDialog(true);
-    updateIsRegister(val);
-  };
+  const handleClickOpenDialog = useCallback(
+    (val: boolean) => {
+      updateIsOpenDialog(true);
+      updateIsRegister(val);
+    },
+    [updateIsOpenDialog, updateIsRegister]
+  );
 
   useEffect(() => {
     if (loginParam === "true") {
       handleClickOpenDialog(false);
     }
-  }, [loginParam]);
+  }, [loginParam, handleClickOpenDialog]);
 
   return (
     <div className="flex justify-between py-3 border-b-2 px-[100px] z-99">
@@ -61,6 +64,8 @@ const Navbar = () => {
         <Image
           height={40}
           width={40}
+          style={{ width: "100%", height: "auto" }}
+          priority
           src="/purwadhika.webp"
           alt="purwafest logo"
         />
