@@ -72,7 +72,7 @@ export default function CreateEvent() {
         append({ name: "", price: 10000, stock: 10 });
       }
     }
-  }, [watchType]);
+  }, [watchType, append, fields.length, setValue]);
 
   const [files, setFiles] = useState<FileList | null>(null);
 
