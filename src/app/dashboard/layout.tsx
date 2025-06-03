@@ -17,9 +17,8 @@ export default function DashboardLayout({
     name: "",
     email: "",
     nameInitial: "",
+    role: "",
   });
-
-  console.log(session)
 
   useEffect(() => {
     if (session?.accessToken) {
@@ -27,12 +26,13 @@ export default function DashboardLayout({
       const name = accessTokenDecoded.name;
       const email = accessTokenDecoded.email;
       const nameInitial = name?.charAt(0) ?? "";
-      setUserDetail({ name, email, nameInitial });
+      const role = session.user.roles[0].split("_")[1];
+      setUserDetail({ name, email, nameInitial, role });
     }
   }, [session]);
 
   return (
-    <div>
+    <div className="flex gap-5 md:mx-[100px] my-4">
       <Sidebar userDetail={userDetail} />
       <main className="flex-1 p-4 bg-gray-50">{children}</main>
     </div>
