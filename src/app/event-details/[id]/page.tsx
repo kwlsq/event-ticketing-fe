@@ -12,11 +12,37 @@ const EventDetailPage = () => {
 
   const eventID = usePathname();
   const { selectedEvent, setSelectedEventID } = useEvents();
-  const [ticketQty, setTicketQty] = useState(1);
+  const [ticketQty, setTicketQty] = useState<Record<number, number>>({});
 
   useEffect(() => {
     setSelectedEventID(parseInt(eventID.split("/")[2]));
   }, [eventID, setSelectedEventID])
+
+  const handleTicketMinus = (id: number) => {
+    setTicketQty((prev) => ({
+      ...prev,
+      [id]: Math.max((prev[id] || 0) - 1, 0),
+    }));
+  };
+
+  const handleTicketPlus = (id: number) => {
+    setTicketQty((prev) => ({
+      ...prev,
+      [id]: Math.max((prev[id] || 0) + 1, 0),
+    }));
+  };
+
+  const handlePurchase = () => {
+    const purchasePayload = {
+      invoiceItemRequests: Object.entries(ticketQty)
+      .filter(([, qty]) => qty > 0)
+      .map(([id, qty]) => ({
+        eventTicketTypeID: Number(id),
+        qty
+      })),
+    };
+    console.log(purchasePayload);
+  }
 
   if (!selectedEvent?.date) return;
 
@@ -24,10 +50,8 @@ const EventDetailPage = () => {
 
   // Get the day of date
   const dayEvent = new Intl.DateTimeFormat('en-US', { weekday: 'long' }).format(dateTimestamp);
-
   // Format the date to DD-MM-YYYY
   const formattedDate = new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: 'long', year: 'numeric' }).format(dateTimestamp);
-
   // Format time to 24 hours
   const formattedTime = new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false }).format(dateTimestamp);
 
@@ -77,43 +101,46 @@ const EventDetailPage = () => {
           </div>
         </div>
         {/* Purchase ticket type */}
-        <div className='w-full flex flex-col gap-5'>
-          {selectedEvent?.eventTicketTypes.map((ticketType) => (
-            <div key={ticketType.id} className='p-4 rounded-xl border-neutral-300 border-solid border-[1px] flex justify-between'>
-              <div className='flex flex-col gap-2.5'>
-                <label className='font-medium'>{ticketType.name}</label>
-                <p className='text-red-700 font-medium'>IDR {ticketType.price}</p>
+        <div className='w-full flex flex-col gap-6'>
+          <div className='flex flex-col gap-5'>
+            {selectedEvent?.eventTicketTypes.map((ticketType) => (
+              <div key={ticketType.id} className='p-4 rounded-xl border-neutral-300 border-solid border-[1px] flex justify-between'>
+                <div className='flex flex-col gap-2.5'>
+                  <label className='font-medium'>{ticketType.name}</label>
+                  <p className='text-red-700 font-medium'>IDR {ticketType.price}</p>
+                </div>
+                <div className='flex gap-4 items-center'>
+                  <Button
+                    variant={"outline"}
+                    className='p-2 border-[1px] border-solid border-neutral-300 rounded-sm'
+                    disabled={ticketQty[ticketType.id] == 0}
+                    onClick={() => handleTicketMinus(ticketType.id)}
+                  >
+                    <Image
+                      src={MinusIcon}
+                      width={14}
+                      height={14}
+                      alt='Minus icon'
+                      className=''
+                    />
+                  </Button>
+                  <span className='font-medium'>{ticketQty[ticketType.id] || 0}</span>
+                  <Button
+                    className='p-2 border-[1px] border-solid border-neutral-300 rounded-sm'
+                    onClick={() => handleTicketPlus(ticketType.id)}
+                  >
+                    <Image
+                      src={PlusIcon}
+                      width={14}
+                      height={14}
+                      alt='Plus icon'
+                    />
+                  </Button>
+                </div>
               </div>
-              <div className='flex gap-4 items-center'>
-                <Button
-                  variant={"outline"}
-                  className='p-2 border-[1px] border-solid border-neutral-300 rounded-sm'
-                  disabled={ticketQty < 1}
-                  onClick={() => setTicketQty(ticketQty - 1)}
-                >
-                  <Image
-                    src={MinusIcon}
-                    width={14}
-                    height={14}
-                    alt='Minus icon'
-                    className=''
-                  />
-                </Button>
-                <span className='font-medium'>{ticketQty}</span>
-                <Button
-                  className='p-2 border-[1px] border-solid border-neutral-300 rounded-sm'
-                  onClick={() => setTicketQty(ticketQty + 1)}
-                >
-                  <Image
-                    src={PlusIcon}
-                    width={14}
-                    height={14}
-                    alt='Plus icon'
-                  />
-                </Button>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
+          <Button type="submit" size={"action"} onClick={handlePurchase}>Purchase tickets</Button>
         </div>
       </div>
     </div>

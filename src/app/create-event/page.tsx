@@ -48,6 +48,7 @@ export default function CreateEvent() {
   const { data: session } = useSession();
   const { regencies, createEvent } = useEvents();
   const [files, setFiles] = useState<FileList | null>(null);
+  const [mediaPreviews, setMediaPreviews] = useState<string[]>();
 
   const { register, control, handleSubmit, watch, setValue, formState: { errors }, } = useForm<EventForm>({
     resolver: zodResolver(eventFormSchema),
@@ -73,6 +74,19 @@ export default function CreateEvent() {
       }
     }
   }, [watchType, append, fields.length, setValue]);
+
+  const handleMediaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFiles = e.target.files;
+
+    if (selectedFiles) {
+      setFiles(selectedFiles);
+
+      const mediaUrls = Array.from(selectedFiles).map((file) =>
+        URL.createObjectURL(file)
+      );
+      setMediaPreviews(mediaUrls);
+    }
+  }
 
 
   const onSubmit = async (data: EventForm) => {
@@ -326,9 +340,22 @@ export default function CreateEvent() {
                 name="multipartFiles"
                 accept="image/*"
                 multiple
-                onChange={(e) => setFiles(e.target.files)}
+                onChange={handleMediaChange}
                 className="mb-4"
               />
+
+              <div className="flex gap-2">
+                {mediaPreviews?.map((media, index) => (
+                  <Image
+                    key={index}
+                    src={media}
+                    width={1000}
+                    height={1000}
+                    alt="image of event"
+                    className="w-16 h-16 object-cover rounded-sm"
+                  />
+                ))}
+              </div>
             </div>
           </div>
         </div>
