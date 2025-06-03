@@ -4,8 +4,8 @@ import { auth } from "@/auth";
 
 const PUBLIC_PATHS = ["/", "/event-details"];
 const ROLE_PATHS = {
-  organizer: ["/dashboard/organizer"],
-  user: ["/dashboard/user"],
+  organizer: ["/dashboard/organizer", "/dashboard/organizer/*"],
+  user: ["/dashboard/user", "/dashboard/user/*"],
 };
 const PROTECTED_PATHS = [...ROLE_PATHS.organizer, ...ROLE_PATHS.user, "/trx/reports"];
 
