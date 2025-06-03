@@ -5,8 +5,9 @@ import { EventProvider } from "./context/use-event";
 import { UserProvider } from "./context/userContext";
 import { Toaster } from "sonner";
 import { PointsProvider } from "./context/pointsContext";
-import Navbar from "@/components/features/Navbar";
 import SessionWrapper from "@/components/features/SessionWrapper";
+import NavbarWrapper from "@/components/features/NavbarWrapper";
+import { Suspense } from "react";
 
 const plusJakarta = Plus_Jakarta_Sans({
   variable: "--font-jakarta",
@@ -29,7 +30,9 @@ export default function RootLayout({
         <SessionWrapper>
           <UserProvider>
             <PointsProvider>
-              <Navbar />
+              <Suspense fallback={<div>Loading Navbar...</div>}>
+                <NavbarWrapper />
+              </Suspense>
               <EventProvider>{children}</EventProvider>
               <Toaster />
             </PointsProvider>

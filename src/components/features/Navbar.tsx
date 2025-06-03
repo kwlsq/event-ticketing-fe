@@ -9,10 +9,10 @@ import { jwtDecode } from "jwt-decode";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
-const Navbar = () => {
+const Navbar = ({ searchParams }: { searchParams: URLSearchParams }) => {
   const {
     isOpenDialog,
     updateIsOpenDialog,
@@ -31,7 +31,6 @@ const Navbar = () => {
     role: "",
   });
 
-  const searchParams = useSearchParams();
   const loginParam = searchParams.get("login");
   const pathname = usePathname();
   useEffect(() => {
