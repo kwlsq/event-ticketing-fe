@@ -12,7 +12,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import Navbar from "@/components/features/navbar/Navbar";
 import SortIcon from '../../public/icon/Sort Descending Icon.svg';
 import Image from "next/image";
 import { cn } from "@/lib/utils";
@@ -69,7 +68,6 @@ export default function Home() {
 
   return (
     <div>
-      <Navbar />
       <div className="mx-[100px] flex flex-col gap-9 mt-5">
         <div className="flex gap-4 items-center">
           <Input

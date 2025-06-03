@@ -8,6 +8,7 @@ import { TokenPair } from "@/types/auth/TokenPair";
 import { PopoverTrigger } from "@radix-ui/react-popover";
 import { signOut } from "next-auth/react";
 import Image from "next/image";
+import Link from "next/link";
 
 interface Props {
   open: boolean;
@@ -16,6 +17,7 @@ interface Props {
     nameInitial: string;
     name: string;
     email: string;
+    role: string;
   };
   session: TokenPair;
 }
@@ -57,14 +59,17 @@ const ProfilePopOver: React.FC<Props> = ({
               <div className="font-bold text-sm">{userDetail.name}</div>
               <div className="text-xs">{userDetail.email}</div>
             </div>
-            <div className="cursor-pointer">
+            <Link
+              href={`/dashboard/${userDetail.role}`}
+              className="cursor-pointer"
+            >
               <Image
                 src="/icon/chevron-right.svg"
                 alt="arrow right icon"
                 height={20}
                 width={20}
               />
-            </div>
+            </Link>
           </div>
           <div className="flex gap-2 items-center mt-2">
             <div>
