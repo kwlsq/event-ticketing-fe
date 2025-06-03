@@ -9,10 +9,10 @@ import { jwtDecode } from "jwt-decode";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
-const Navbar = () => {
+const Navbar = ({ searchParams }: { searchParams: URLSearchParams }) => {
   const {
     isOpenDialog,
     updateIsOpenDialog,
@@ -28,19 +28,19 @@ const Navbar = () => {
     name: "",
     email: "",
     nameInitial: "",
+    role: "",
   });
 
-  const searchParams = useSearchParams();
   const loginParam = searchParams.get("login");
   const pathname = usePathname();
-
   useEffect(() => {
     if (session?.accessToken) {
       const accessTokenDecoded = jwtDecode<TokenClaims>(session.accessToken);
       const name = accessTokenDecoded.name;
       const email = accessTokenDecoded.email;
       const nameInitial = name?.charAt(0) ?? "";
-      setUserDetail({ name, email, nameInitial });
+      const role = session.user.roles[0].split("_")[1];
+      setUserDetail({ name, email, nameInitial, role });
     }
   }, [session]);
 

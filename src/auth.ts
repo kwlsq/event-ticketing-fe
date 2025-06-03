@@ -81,7 +81,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             return session;
         },
         async jwt({ token, user }) {
-            console.log("IN JWT CALLBACK: ", user);
+            // console.log("IN JWT CALLBACK: ", user);
             if (user) {
                 token = {
                     accessToken: {

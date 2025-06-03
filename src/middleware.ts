@@ -2,31 +2,37 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { auth } from "@/auth";
 
-const PUBLIC_PATHS = ["*"];
+const PUBLIC_PATHS = ["/", "/event-details"];
 const ROLE_PATHS = {
-  organizer: ["/organizer", "/organizer/*"],
-  user: ["/user", "/user/*"],
+  organizer: ["/dashboard/organizer", "/dashboard/organizer/*"],
+  user: ["/dashboard/user", "/dashboard/user/*"],
 };
-const PROTECTED_PATHS = [...ROLE_PATHS.organizer, ...ROLE_PATHS.user, "/transaction"];
+const PROTECTED_PATHS = [...ROLE_PATHS.organizer, ...ROLE_PATHS.user, "/trx/reports"];
 
 async function getSession() {
   return await auth();
 }
 
 function isPublicPath(pathname: string) {
-  return PUBLIC_PATHS.some((path) => pathname.startsWith(path));
+  return PUBLIC_PATHS.some((path) => pathname === path || pathname.startsWith(`${path}/`));
 }
 
 function isProtectedPath(pathname: string) {
-  return PROTECTED_PATHS.some((path) => pathname.startsWith(path));
+  const result = PROTECTED_PATHS.some(
+    (path) => pathname === path || pathname.startsWith(`${path}/`)
+  );
+  return result;
 }
 
 function hasRequiredRole(userRoles: string[], pathname: string) {
-  if (userRoles.includes("ADMIN")) {
-    return true;
-  }
+  const cleanRole = userRoles.map((each) => each.replace("ROLE_", "").toLowerCase());
   for (const [role, paths] of Object.entries(ROLE_PATHS)) {
-    if (paths.some((path) => pathname.startsWith(path)) && userRoles.includes(role)) {
+    if (
+      paths.some(
+        (path) => pathname === path || pathname.startsWith(`${path}/`)
+      ) &&
+      cleanRole.includes(role)
+    ) {
       return true;
     }
   }

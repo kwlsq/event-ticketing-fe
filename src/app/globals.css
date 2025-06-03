@@ -4,7 +4,6 @@
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
-@custom-variant dark (&:is(.dark *));
 
 body {
   font-size: 16px;
@@ -79,8 +78,8 @@ body {
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.205 0 0);
   --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-accent: oklch(0.9663 0.0165 250.84);
+  --sidebar-accent-foreground: oklch(0.6069 0.2154 257);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
 }
