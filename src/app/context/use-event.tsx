@@ -5,6 +5,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { ReactNode } from "react";
 import { EventProps, EventRequest, EventDetailsProps } from "@/types/event/event";
 import { API_URL } from "@/constants/url";
+import { useSearchParams } from "next/navigation";
 
 interface LocationProps {
   code: string;
@@ -41,6 +42,9 @@ interface EventContextType {
 const EventContext = createContext<EventContextType | undefined>(undefined);
 
 export const EventProvider = ({ children }: { children: ReactNode }) => {
+
+  const searchParams = useSearchParams();
+
   const [events, setEvents] = useState<EventProps[]>([]);
   const [selectedEventID, setSelectedEventID] = useState(0);
   const [selectedEvent, setSelectedEvent] = useState<EventDetailsProps | null>(null);
@@ -54,6 +58,17 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
   const [regencies, setRegencies] = useState<LocationProps[]>([]);
   const [location, setLocation] = useState("");
 
+  useEffect(() => {
+    const pageParam = Number(searchParams.get("page") || "0");
+    const sortParam = searchParams.get("sort") || "id";
+    const queryParam = searchParams.get("query") || "";
+    const locationParam = searchParams.get("location") || "";
+
+    setPage(pageParam);
+    setSort(sortParam);
+    setQuery(queryParam);
+    setLocation(locationParam);
+  }, []);
 
   // Fetch event data
   useEffect(() => {
@@ -80,7 +95,7 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
       }
     }
     fetchEventData();
-  }, [page, sort, totalPages, query, location]);
+  }, [page, sort, totalPages, query, location, totalElements]);
 
   // Fetch regencies for Jakarta and West Java
   useEffect(() => {
@@ -117,6 +132,7 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
     fetchEventDetails();
   }, [selectedEventID]);
 
+  // Create event function
   const createEvent = async (newEvent: EventRequest, accessToken: string): Promise<EventDetailsProps | undefined> => {
     try {
 
@@ -125,21 +141,11 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
           Authorization: `Bearer ${accessToken}`
         }
       });
-      
+
       const createdEvent: EventDetailsProps = response.data.data;
 
-      setEvents(prev => [{
-        id: createdEvent.id,
-        name: createdEvent.name,
-        date: createdEvent.date,
-        venue: createdEvent.venue,
-        location: createdEvent.location,
-        isEventFree: newEvent.isEventFree,
-        startingPrice: newEvent.ticketTypeRequest[0]?.price || 0
-      }, ...prev]);
+      setTotalElements(totalElements + 1);
 
-      // delete cached created event after successfully create event
-      localStorage.removeItem("cachedCreatedEvent");
       return createdEvent;
     } catch (error) {
       setError(error);
@@ -147,7 +153,30 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <EventContext.Provider value={{ events, loading, error, selectedEvent, setSelectedEvent, totalPages, setTotalPages, page, setPage, sort, setSort, query, setQuery, totalElements, setTotalElements, regencies, setRegencies, selectedEventID, setSelectedEventID, location, setLocation, createEvent }}>
+    <EventContext.Provider value={{
+      events,
+      loading,
+      error,
+      selectedEvent,
+      setSelectedEvent,
+      totalPages,
+      setTotalPages,
+      page,
+      setPage,
+      sort,
+      setSort,
+      query,
+      setQuery,
+      totalElements,
+      setTotalElements,
+      regencies,
+      setRegencies,
+      selectedEventID,
+      setSelectedEventID,
+      location,
+      setLocation,
+      createEvent
+    }}>
       {children}
     </EventContext.Provider>
   )

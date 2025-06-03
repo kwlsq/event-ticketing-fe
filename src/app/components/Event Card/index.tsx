@@ -15,9 +15,9 @@ import { FC } from "react";
 import { useEvents } from "@/app/context/use-event";
 import { useRouter } from "next/navigation";
 
-const EventCard : FC<EventProps> = ({name, date, venue, location, startingPrice, id, thumbnailUrl}) => {
+const EventCard: FC<EventProps> = ({ name, date, venue, location, startingPrice, id, thumbnailUrl }) => {
 
-  const {setSelectedEventID} = useEvents();
+  const { setSelectedEventID } = useEvents();
   const router = useRouter();
 
   const handleClickCard = (eventID: number) => {
@@ -28,28 +28,27 @@ const EventCard : FC<EventProps> = ({name, date, venue, location, startingPrice,
   const dateTimestamp = new Date(date);
 
   // Get the day of date
-  const dayEvent = new Intl.DateTimeFormat('en-US', {weekday: 'long'}).format(dateTimestamp);
+  const dayEvent = new Intl.DateTimeFormat('en-US', { weekday: 'long' }).format(dateTimestamp);
 
   // Format the date to DD-MM-YYYY
-  const formattedDate = new Intl.DateTimeFormat('en-GB', {day: '2-digit', month: 'long', year: 'numeric'}).format(dateTimestamp);
+  const formattedDate = new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: 'long', year: 'numeric' }).format(dateTimestamp);
 
   // Format time to 24 hours
-  const formattedTime = new Intl.DateTimeFormat('en-GB', {hour: '2-digit', minute:'2-digit', hour12:false}).format(dateTimestamp);
+  const formattedTime = new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false }).format(dateTimestamp);
 
   return (
     <Card
-    className="shadow-none border-none p-0 w-full"
-    onClick={() => {handleClickCard(id)}}
+      className="shadow-none border-none p-0 w-full"
+      onClick={() => { handleClickCard(id) }}
     >
-      <CardHeader className="p-0 gap-0">
+      <CardHeader className="p-0 gap-0 object-cover w-full h-[200px] rounded-2xl relative overflow-hidden">
         <Image
-          src= {thumbnailUrl || "https://placehold.co/295x200.png"}
+          src={thumbnailUrl || "https://placehold.co/295x200.png"}
           alt="event image"
-          className="rounded-2xl"
+          fill
+          className="object-cover"
           quality={100}
-          layout="responsive"
-          width={295}
-          height={200}
+          priority
         />
       </CardHeader>
       <CardContent className="flex flex-col gap-2.5 p-0 justify-center">
@@ -58,9 +57,9 @@ const EventCard : FC<EventProps> = ({name, date, venue, location, startingPrice,
         </CardTitle>
         <div className="flex gap-3 items-center text-xl">
           <CardDescription>
-            {dayEvent.substring(0,3)}, {formattedDate}
+            {dayEvent.substring(0, 3)}, {formattedDate}
           </CardDescription>
-          <CardDescription className="text-base w-1.5 h-1.5 bg-neutral-400 rounded-full"/>
+          <CardDescription className="text-base w-1.5 h-1.5 bg-neutral-400 rounded-full" />
           <CardDescription>
             {formattedTime}
           </CardDescription>

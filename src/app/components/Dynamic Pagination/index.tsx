@@ -1,5 +1,6 @@
-import { FC, useState } from 'react';
+import { FC } from 'react';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, PaginationEllipsis } from '@/components/ui/pagination';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 interface DynamicPaginationProps {
   totalPages: number
@@ -7,20 +8,28 @@ interface DynamicPaginationProps {
 }
 
 const DynamicPagination : FC<DynamicPaginationProps> = ({totalPages, setPages}) => {
-  const [currentPage, setCurrentPage] = useState(1);
+
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  const pageParam = Number(searchParams.get("page") || "0");
+  const currentPage = pageParam + 1;
 
   const handlePageChange = (page: number) => {
-    if(page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
-      // Pagination for event
-      setPages(page - 1);
-    }
+    if (page < 0 || page > totalPages) return;
+
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("page", (page - 1).toString());
+    router.push(`?${params.toString()}`);
+
+    setPages(page - 1);
   };
 
   const handleEllipsis = (page: number) => {
-    setCurrentPage(page);
+    handlePageChange(page);
   }
 
+  // Calculate page range  (only show 3 page number, the rest will be ellipsis)
   const getPageRange = () => {
     let startPage = currentPage - 1;
     let endPage = currentPage + 1;

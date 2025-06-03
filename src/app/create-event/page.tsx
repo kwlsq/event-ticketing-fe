@@ -46,6 +46,8 @@ export type EventForm = z.infer<typeof eventFormSchema>;
 
 export default function CreateEvent() {
   const { data: session } = useSession();
+  const { regencies, createEvent } = useEvents();
+  const [files, setFiles] = useState<FileList | null>(null);
 
   const { register, control, handleSubmit, watch, setValue, formState: { errors }, } = useForm<EventForm>({
     resolver: zodResolver(eventFormSchema),
@@ -54,8 +56,6 @@ export default function CreateEvent() {
       isEventFree: true
     }
   });
-
-  const { regencies, createEvent } = useEvents();
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -74,7 +74,6 @@ export default function CreateEvent() {
     }
   }, [watchType, append, fields.length, setValue]);
 
-  const [files, setFiles] = useState<FileList | null>(null);
 
   const onSubmit = async (data: EventForm) => {
     try {
@@ -113,8 +112,6 @@ export default function CreateEvent() {
         );
 
         imageUploadResponse = res.data;
-        console.log(imageUploadResponse);
-
       }
 
       // Send event + image data to your own event creation endpoint here (if needed)
