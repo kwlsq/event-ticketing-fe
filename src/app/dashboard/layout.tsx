@@ -1,13 +1,16 @@
 "use client";
 
-import Navbar from "@/components/features/navbar/Navbar";
-import Sidebar from "../components/Sidebar";
 import { useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
 import { TokenClaims } from "@/types/auth/TokenPair";
 import { useSession } from "next-auth/react";
+import Sidebar from "./components/Sidebar";
 
-export default function DashboardPage() {
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const { data: session } = useSession();
 
   const [userDetail, setUserDetail] = useState({
@@ -15,6 +18,8 @@ export default function DashboardPage() {
     email: "",
     nameInitial: "",
   });
+
+  console.log(session)
 
   useEffect(() => {
     if (session?.accessToken) {
@@ -28,8 +33,8 @@ export default function DashboardPage() {
 
   return (
     <div>
-      <Navbar></Navbar>
       <Sidebar userDetail={userDetail} />
+      <main className="flex-1 p-4 bg-gray-50">{children}</main>
     </div>
   );
 }

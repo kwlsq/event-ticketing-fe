@@ -24,7 +24,6 @@ const Navbar = () => {
   } = useUserContext();
 
   const { data: session } = useSession();
-  console.log(session);
   const [userDetail, setUserDetail] = useState({
     name: "",
     email: "",
@@ -35,7 +34,6 @@ const Navbar = () => {
   const searchParams = useSearchParams();
   const loginParam = searchParams.get("login");
   const pathname = usePathname();
-
   useEffect(() => {
     if (session?.accessToken) {
       const accessTokenDecoded = jwtDecode<TokenClaims>(session.accessToken);

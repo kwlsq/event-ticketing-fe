@@ -1,4 +1,3 @@
-import Navbar from "@/components/features/navbar/Navbar";
 import { Button } from "@/components/ui/button";
 import { useUserContext } from "../context/userContext";
 import AuthDialog from "../components/AuthDialog";
@@ -14,7 +13,6 @@ const NewOrganizerView = () => {
 
   return (
     <div>
-      <Navbar />
       <div className="relative min-h-[calc(100vh-64px)] flex justify-center px-4">
         <div
           className="absolute inset-0 bg-cover bg-center z-0"
