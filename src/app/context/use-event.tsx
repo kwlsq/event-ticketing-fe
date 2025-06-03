@@ -68,7 +68,7 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
     setSort(sortParam);
     setQuery(queryParam);
     setLocation(locationParam);
-  }, []);
+  }, [searchParams]);
 
   // Fetch event data
   useEffect(() => {
