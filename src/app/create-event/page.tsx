@@ -23,6 +23,11 @@ const ticketTypeSchema = z.object({
   stock: z.number().nonnegative().min(10, { message: "Minimum stock is 10!" })
 });
 
+enum PromotionType {
+  Percentage = "PERCENTAGE",
+  Nominal= "NOMINAL"
+}
+
 const eventFormSchema = z.object({
   name: z.string().min(1, { message: "Event name cannot be empty!" }).min(5, { message: "Should be more than 5 characters" }),
   description: z.string().min(1, { message: "Description cannot be empty!" }).max(255),
@@ -39,7 +44,15 @@ const eventFormSchema = z.object({
   }, { message: "Date cannot be in the past!" }),
   isEventFree: z.boolean(),
   location: z.string(),
-  ticketTypeRequest: z.array(ticketTypeSchema)
+  ticketTypeRequest: z.array(ticketTypeSchema),
+  eventPromotion: z.object({
+    name: z.string().min(1, { message: "Promotion name cannot be empty!" }).min(5, { message: "Should be more than 5 characters" }),
+    description: z.string().min(1, { message: "Description name cannot be empty!" }).min(5, { message: "Should be more than 5 characters" }),
+    type: z.enum([PromotionType.Percentage, PromotionType.Nominal]),
+    value: z.number(),
+    maxUsage: z.number(),
+    isReferralPromotion: z.boolean()
+  }).optional()
 });
 
 export type EventForm = z.infer<typeof eventFormSchema>;
@@ -142,7 +155,7 @@ export default function CreateEvent() {
       className="w-full flex gap-4 px-24"
       onSubmit={handleSubmit(onSubmit)}
     >
-      <div className="w-2/3 flex flex-col">
+      <div className="w-2/3 flex flex-col gap-4">
         <div className="flex flex-col gap-4">
           {/* Define event details */}
           <div className="flex flex-col gap-4 p-6 border border-neutral-300 rounded-xl">
@@ -333,17 +346,17 @@ export default function CreateEvent() {
               <label className="text-xl font-medium">
                 Media upload <span className="text-red-500">*</span>
               </label>
-              <p className="text-sm">Upload your event image or posters</p>
-
-              <input
-                type="file"
-                name="multipartFiles"
-                accept="image/*"
-                multiple
-                onChange={handleMediaChange}
-                className="mb-4"
-              />
-
+              <p className="text-sm">Add your event posters here, you can upload up to 5 files max</p>
+              <div >
+                <input
+                  type="file"
+                  name="multipartFiles"
+                  accept="image/*"
+                  multiple
+                  onChange={handleMediaChange}
+                  className="p-4 border-neutral-200 border-dashed border-[1px] rounded-md w-full hover:bg-neutral-100"
+                />
+              </div>
               <div className="flex gap-2">
                 {mediaPreviews?.map((media, index) => (
                   <Image
@@ -360,47 +373,108 @@ export default function CreateEvent() {
           </div>
         </div>
       </div>
-      <div className="flex flex-col gap-2 w-1/3">
+      <div className="flex flex-col w-1/3 gap-4">
         {/* Define ticket type */}
-        <div className="flex flex-col gap-4 p-6 border border-neutral-300 rounded-xl">
-          <div className="flex flex-col">
-            <label className="text-xl font-medium">
-              Ticket type <span className="text-red-500">*</span>
-            </label>
-            <p className="text-sm">Define ticket type that can be bought by customer</p>
-          </div>
-          <div className="flex flex-col gap-3">
-            {fields.map((field, index) => (
-              <EventTicketTypeCard
-                key={field.id}
-                index={index}
-                register={register}
-                errors={errors}
-                remove={() => remove(index)}
-                isEventFree={watchType}
-              />
-            ))}
-            {/* Button to add new ticket type card */}
-            {!watchType && (
-              <Button
-                type="button"
-                variant={"outline"}
-                size={"action"}
-                className="border-dashed text-sm flex flex-col gap-3 h-fit p-6"
-                onClick={() => append({ name: "", price: 10000, stock: 10 })}
-              >
-                <Image
-                  src={PlusIcon}
-                  width={36}
-                  height={36}
-                  alt="Plus Icon"
+        <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-4 p-6 border border-neutral-300 rounded-xl">
+            <div className="flex flex-col">
+              <label className="text-xl font-medium">
+                Ticket type <span className="text-red-500">*</span>
+              </label>
+              <p className="text-sm">Define ticket type that can be bought by customer</p>
+            </div>
+            <div className="flex flex-col gap-3">
+              {fields.map((field, index) => (
+                <EventTicketTypeCard
+                  key={field.id}
+                  index={index}
+                  register={register}
+                  errors={errors}
+                  remove={() => remove(index)}
+                  isEventFree={watchType}
                 />
-                Add Ticket Type
-              </Button>
-            )}
+              ))}
+              {/* Button to add new ticket type card */}
+              {!watchType && (
+                <Button
+                  type="button"
+                  variant={"outline"}
+                  size={"action"}
+                  className="border-dashed text-sm flex flex-col gap-3 h-fit p-6"
+                  onClick={() => append({ name: "", price: 10000, stock: 10 })}
+                >
+                  <Image
+                    src={PlusIcon}
+                    width={36}
+                    height={36}
+                    alt="Plus Icon"
+                  />
+                  Add Ticket Type
+                </Button>
+              )}
+            </div>
           </div>
         </div>
-        <Button type="submit">Submit</Button>
+
+        {/* Create promotion */}
+        <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-4 p-6 border border-neutral-300 rounded-xl">
+            <div className="flex flex-col">
+              <label className="text-xl font-medium">
+                Promotion <span className="text-red-500">*</span>
+              </label>
+              <p className="text-sm">Add promotion to boost sales</p>
+            </div>
+            <div className="flex flex-col gap-3">
+              <div className="flex gap-2">
+                <div className="flex flex-col gap-3 w-3/5">
+                  <label className="text-sm font-medium">
+                    Value <span className="text-red-500">*</span>
+                  </label>
+                  <div className="flex flex-col gap-1">
+                    <Input
+                      placeholder="Event name"
+                      {...register("name")}
+                      className={`border ${errors.eventPromotion?.value && 'border-red-500'}`}
+                    />
+                    {errors.eventPromotion?.value && <p className="text-red-500 text-xs">{errors.eventPromotion?.value.message}</p>}
+                  </div>
+                </div>
+
+                {/* Choose promotion unit (percentage or nominal) */}
+                <div className="flex flex-col gap-3 w-2/5">
+                  <label className="text-sm font-medium">
+                    Event type <span className="text-red-500">*</span>
+                  </label>
+                  <Controller
+                    control={control}
+                    name="eventPromotion.type"
+                    render={({ field }) => (
+                      <Select
+                        value={field.value}
+                        onValueChange={field.onChange}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Percentage" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectGroup>
+                            <SelectItem value={PromotionType.Percentage}>Percentage</SelectItem>
+                            <SelectItem value={PromotionType.Nominal}>Nominal</SelectItem>
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <Button
+          type="submit"
+          size={"action"}
+        >Submit</Button>
       </div>
     </form>
   ) : (
