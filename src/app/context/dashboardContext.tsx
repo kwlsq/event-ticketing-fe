@@ -1,6 +1,6 @@
 "use client";
 
-import { DashboardData, DashboardFilter } from "@/types/dashboard/Dashboard";
+import { DashboardApiResponse, DashboardFilter } from "@/types/dashboard/Dashboard";
 import {
   createContext,
   FC,
@@ -14,7 +14,7 @@ import { getDashboardData } from "../services/dashboardService";
 import { useSession } from "next-auth/react";
 
 interface DashboardContextType {
-  dashboardData: DashboardData | undefined;
+  dashboardData: DashboardApiResponse | undefined;
   dashboardFilter: DashboardFilter;
   setDashboardFilter: (filter: DashboardFilter) => void;
 }
