@@ -5,6 +5,7 @@ import { sidebarOrganizer } from "../consts/sidebarOrganizer";
 import { ListMenuItem } from "@/types/dashboard/Dashboard";
 import Link from "next/link";
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 
 interface Props {
   userDetail: {
@@ -17,7 +18,11 @@ interface Props {
 
 const Sidebar: React.FC<Props> = ({ userDetail }) => {
   const { totalPoints } = usePointsContext();
-  const [selectedMenu, setSelectedMenu] = useState<string>("profile");
+  const pathname = usePathname();
+
+  const [selectedMenu, setSelectedMenu] = useState<string>(
+    pathname.split("/")[3] || "profile"
+  );
 
   const sidebarMenus: Array<ListMenuItem> =
     userDetail.role === "user" ? sidebarUser : sidebarOrganizer;

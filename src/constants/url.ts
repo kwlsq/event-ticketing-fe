@@ -21,5 +21,6 @@ export const API_URL = {
   },
   points:{
     totalPoints: "/api/v1/point"
-  }
+  },
+  dashboard: "/api/v1/dashboard"
 };

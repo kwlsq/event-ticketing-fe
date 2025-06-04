@@ -34,7 +34,7 @@ export default function DashboardLayout({
   return (
     <div className="flex gap-5 md:mx-[100px] my-4">
       <Sidebar userDetail={userDetail} />
-      <main className="flex-1 p-4 bg-gray-50">{children}</main>
+      <main className="p-4 w-full ">{children}</main>
     </div>
   );
 }
