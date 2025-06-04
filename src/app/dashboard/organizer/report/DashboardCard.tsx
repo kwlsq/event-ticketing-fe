@@ -15,11 +15,11 @@ export default function DashboardCard({ dashboardData }: DashboardCardProps) {
     <div className="grid md:grid-cols-3 w-full md:gap-10">
       <div className={cardStyle}>
         <div className={cardTitleStyle}>Total Sales</div>
-        <div className={cardContentStyle}>{totalSales}</div>
+        <div className={cardContentStyle}>{`Rp ${totalSales?.toLocaleString("id-ID")},-`}</div>
       </div>
       <div className={cardStyle}>
         <div className={cardTitleStyle}>Total Attendees</div>
-        <div className={cardContentStyle}>{totalAttendees}</div>
+        <div className={cardContentStyle}>{totalAttendees} people</div>
       </div>
       <div className={cardStyle}>
         <div className={cardTitleStyle}>Total Events</div>
