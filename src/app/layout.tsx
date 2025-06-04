@@ -8,6 +8,7 @@ import { PointsProvider } from "./context/pointsContext";
 import SessionWrapper from "@/components/features/SessionWrapper";
 import NavbarWrapper from "@/components/features/NavbarWrapper";
 import { Suspense } from "react";
+import { DashboardProvider } from "./context/dashboardContext";
 
 const plusJakarta = Plus_Jakarta_Sans({
   variable: "--font-jakarta",
@@ -30,11 +31,13 @@ export default function RootLayout({
         <SessionWrapper>
           <UserProvider>
             <PointsProvider>
-              <Suspense fallback={<div>Loading Navbar...</div>}>
-                <NavbarWrapper />
-              </Suspense>
-              <EventProvider>{children}</EventProvider>
-              <Toaster />
+              <DashboardProvider>
+                <Suspense fallback={<div>Loading Navbar...</div>}>
+                  <NavbarWrapper />
+                </Suspense>
+                <EventProvider>{children}</EventProvider>
+                <Toaster />
+              </DashboardProvider>
             </PointsProvider>
           </UserProvider>
         </SessionWrapper>
