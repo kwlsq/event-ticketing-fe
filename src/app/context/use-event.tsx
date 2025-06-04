@@ -25,7 +25,8 @@ interface EventContextType {
   totalElements: number,
   regencies: LocationProps[],
   location: string,
-
+  ticketQty: Record<number, number>
+  
   setSelectedEventID: (selectedEventID: number) => void,
   setSelectedEvent: (selectedEvent: EventDetailsProps | null) => void,
   setTotalPages: (totalPages: number) => void,
@@ -34,7 +35,8 @@ interface EventContextType {
   setQuery: (query: string) => void,
   setTotalElements: (totalElements: number) => void,
   setRegencies: (regencies: LocationProps[]) => void,
-  setLocation: (location: string) => void
+  setLocation: (location: string) => void,
+  setTicketQty: React.Dispatch<React.SetStateAction<Record<number, number>>>;
 
   createEvent: (newEvent: EventRequest, accessToken: string) => Promise<EventDetailsProps | undefined>
 }
@@ -57,6 +59,7 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
   const [totalElements, setTotalElements] = useState(0);
   const [regencies, setRegencies] = useState<LocationProps[]>([]);
   const [location, setLocation] = useState("");
+  const [ticketQty, setTicketQty] = useState<Record<number, number>>({});
 
   useEffect(() => {
     const pageParam = Number(searchParams.get("page") || "0");
@@ -175,7 +178,9 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
       setSelectedEventID,
       location,
       setLocation,
-      createEvent
+      createEvent,
+      ticketQty,
+      setTicketQty
     }}>
       {children}
     </EventContext.Provider>
