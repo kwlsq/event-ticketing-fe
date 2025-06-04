@@ -60,7 +60,7 @@ const ProfilePopOver: React.FC<Props> = ({
               <div className="text-xs">{userDetail.email}</div>
             </div>
             <Link
-              href={`/dashboard/${userDetail.role}`}
+              href={`/dashboard/${userDetail.role}/profile`}
               className="cursor-pointer"
             >
               <Image
