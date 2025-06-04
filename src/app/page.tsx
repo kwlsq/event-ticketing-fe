@@ -17,6 +17,7 @@ import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { ChangeEvent, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 
 const sortLabels: Record<string, string> = {
   name: "Sort by Name",
@@ -41,14 +42,36 @@ const debounce = <T extends (...args: any[]) => void>(
 export default function Home() {
   const { events, totalPages, setSort, sort, query, setQuery, totalElements, setPage, regencies, location, setLocation } = useEvents();
   const [searchQuery, setSearchQuery] = useState(query);
+  const router = useRouter();
 
   const handleSort = (value: string) => {
+    const params = new URLSearchParams(window.location.search);
+
+    if (value !== "id") {
+      params.set("sort", value);
+    } else {
+      params.delete("sort");
+    }
+
+    params.set("page", "0")
+    router.push(`?${params.toString()}`)
     setSort(value);
   };
 
   const debouncedSetQuery = useRef(
-    debounce((val: string) =>
-      setQuery(val), 500)
+    debounce((val: string) => {
+      const params = new URLSearchParams(window.location.search);
+
+      if (val) {
+        params.set("query", val);
+      } else {
+        params.delete("query");
+      }
+
+      params.set("page", "0");
+      router.push(`?${params.toString()}`);
+      setQuery(val)
+    }, 500)
   ).current;
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -58,12 +81,18 @@ export default function Home() {
   }
 
   const handleLocationFilter = (location: string) => {
-    if (location === "__all__") {
+    const params = new URLSearchParams(window.location.search);
+
+    if (location === "all") {
+      params.delete("location");
       setLocation("");
+    } else {
+      params.set("location", location);
+      setLocation(location);
     }
 
-    console.log(location);
-    setLocation(location);
+    params.set("page", "0");
+    router.push(`?${params.toString()}`)
   }
 
   return (
@@ -81,14 +110,15 @@ export default function Home() {
             <Select onValueChange={handleLocationFilter} value={location}>
               <SelectTrigger className={cn("rounded-full border-none shadow-none", location !== "" && "border-neutral-600")}>
                 <SelectValue
-                >{location === "" ? "All locations" : location}</SelectValue>
+                  placeholder="All location"
+                />
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
                   <SelectLabel>Location</SelectLabel>
-                    <SelectItem value={"__all__"}>
-                      All locations
-                    </SelectItem>
+                  <SelectItem value={"all"}>
+                    All locations
+                  </SelectItem>
                   {regencies.map((regency) => (
                     <SelectItem key={regency.code} value={regency.name}>
                       {regency.name}
@@ -102,19 +132,29 @@ export default function Home() {
 
         {/* Filter button & title */}
         <div className="flex justify-end w-full items-end">
-          {query === ""
-            ?
+          {query === "" && location === "" && (
             <h2
               className="text-2xl font-semibold w-full"
             >Showing events in Indonesia
-            </h2>
-            :
+            </h2>)}
 
+          {query !== "" && location === "" && (
             <h2
               className="text-2xl font-semibold w-full"
-            >
-              Showing {totalElements} results for &quot;{query}&quot;
-            </h2>}
+            >Showing {totalElements} results for &quot;{query}&quot;
+            </h2>)}
+
+          {query === "" && location !== "" && (
+            <h2
+              className="text-2xl font-semibold w-full"
+            >Showing events in {location}
+            </h2>)}
+
+          {query !== "" && location !== "" && (
+            <h2
+              className="text-2xl font-semibold w-full"
+            >Showing {totalElements} results for &quot;{query}&quot; in {location}
+            </h2>)}
           <div className={cn("flex gap-3.5 w-full justify-end", sort !== "id" ? "text-neutral-600" : "text-neutral-400")}>
             <Select onValueChange={handleSort} value={sort}>
               <SelectTrigger className={cn("rounded-full", sort !== "id" && "border-neutral-600")}>
@@ -153,6 +193,7 @@ export default function Home() {
                 startingPrice={event.startingPrice}
                 id={event.id}
                 isEventFree={event.isEventFree}
+                thumbnailUrl={event.thumbnailUrl}
               />
             </div>
           ))}
