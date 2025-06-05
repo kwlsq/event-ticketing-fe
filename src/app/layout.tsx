@@ -35,7 +35,9 @@ export default function RootLayout({
                 <Suspense fallback={<div>Loading Navbar...</div>}>
                   <NavbarWrapper />
                 </Suspense>
-                <EventProvider>{children}</EventProvider>
+                <Suspense>
+                  <EventProvider>{children}</EventProvider>
+                </Suspense>
                 <Toaster />
               </DashboardProvider>
             </PointsProvider>
