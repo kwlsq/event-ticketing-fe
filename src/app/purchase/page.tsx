@@ -11,6 +11,9 @@ import { Input } from "@/components/ui/input";
 import { z } from 'zod';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { usePointsContext } from "../context/pointsContext";
+import PointIcon from "../../../public/icon/point.svg";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 const creditCardSchema = z.object({
   holderName: z.string().min(1, { message: "Event name cannot be empty!" }).min(5, { message: "Should be more than 5 characters" }),
@@ -22,8 +25,9 @@ const creditCardSchema = z.object({
 export type CCForm = z.infer<typeof creditCardSchema>;
 const PurchasePage = () => {
 
-  const { ticketQty, setTicketQty, selectedEvent } = useEvents();
+  const { ticketQty, setTicketQty, selectedEvent, promotions } = useEvents();
   const [subtotal, setSubtotal] = useState(0);
+  const { totalPoints } = usePointsContext();
 
 
   const { register, formState: { errors }, } = useForm<CCForm>({
@@ -60,7 +64,7 @@ const PurchasePage = () => {
   }, [ticketQty, selectedEvent?.eventTicketTypes])
 
   return (
-    <div className="flex w-full px-40 gap-10">
+    <div className="flex w-full px-40 py-9 gap-10">
       <div className="w-2/3">
         <div className="flex flex-col gap-3">
           <h2 className="font-semibold text-xl">Payment Details</h2>
@@ -189,7 +193,61 @@ const PurchasePage = () => {
             </div>
           </div>
 
+          {/* Divider */}
           <p className="w-full border-dashed border-[1px] border-neutral-200" />
+
+          {/* Select voucher */}
+          <div className="flex flex-col gap-1">
+            <label className="font-medium text-xs">Use your voucher</label>
+            <Select>
+              <SelectTrigger className="w-full text-sm h-fit">
+                <SelectValue placeholder="Choose voucher" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>
+                    Your unused voucher
+                  </SelectLabel>
+                  <SelectItem value="Music">
+                    <div>
+                      <label>{promotions?.name}</label>
+                      {promotions?.type === "NOMINAL"
+                      ? <p>Get Rp. {promotions?.value} cashback from your purchase</p>
+                      : <p>Get {promotions?.value}% from product price</p>
+                      }
+                      <p>Get {promotions?.value} from product price</p>
+                    </div>
+                  </SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          {/* Point checkbox */}
+          <div className="flex flex-col gap-1">
+            <label className="font-medium text-xs">Pay with your points</label>
+            <div
+              className="p-3 w-full h-fit flex items-center justify-between disabled:pointer-events-none border-solid border-[1px] rounded-xl border-input"
+            >
+              <div className="flex gap-2">
+                <Image
+                  src={PointIcon}
+                  width={24}
+                  height={24}
+                  alt="Point icon"
+                />
+                <div className="items-start flex flex-col">
+                  <label className="text-xs font-medium">Purwa Point</label>
+                  <span className="font-semibold">{totalPoints}</span>
+                </div>
+              </div>
+              <Input
+                type="checkbox"
+                className="w-5 h-5 border-neutral-300"
+              />
+            </div>
+          </div>
+
           <Button size={"action"}>Continue to payment</Button>
 
         </div>

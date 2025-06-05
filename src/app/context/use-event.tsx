@@ -6,6 +6,7 @@ import { ReactNode } from "react";
 import { EventProps, EventRequest, EventDetailsProps } from "@/types/event/event";
 import { API_URL } from "@/constants/url";
 import { useSearchParams } from "next/navigation";
+import { PromotionProps } from "@/types/promotion/promotion";
 
 interface LocationProps {
   code: string;
@@ -25,7 +26,8 @@ interface EventContextType {
   totalElements: number,
   regencies: LocationProps[],
   location: string,
-  ticketQty: Record<number, number>
+  ticketQty: Record<number, number>,
+  promotions: PromotionProps | null
   
   setSelectedEventID: (selectedEventID: number) => void,
   setSelectedEvent: (selectedEvent: EventDetailsProps | null) => void,
@@ -36,7 +38,8 @@ interface EventContextType {
   setTotalElements: (totalElements: number) => void,
   setRegencies: (regencies: LocationProps[]) => void,
   setLocation: (location: string) => void,
-  setTicketQty: React.Dispatch<React.SetStateAction<Record<number, number>>>;
+  setTicketQty: React.Dispatch<React.SetStateAction<Record<number, number>>>,
+  setPromotions: (promotion: PromotionProps) => void
 
   createEvent: (newEvent: EventRequest, accessToken: string) => Promise<EventDetailsProps | undefined>
 }
@@ -60,6 +63,7 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
   const [regencies, setRegencies] = useState<LocationProps[]>([]);
   const [location, setLocation] = useState("");
   const [ticketQty, setTicketQty] = useState<Record<number, number>>({});
+  const [promotions, setPromotions] = useState<PromotionProps | null>(null);
 
   useEffect(() => {
     const pageParam = Number(searchParams.get("page") || "0");
@@ -89,7 +93,6 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
         const events: EventProps[] = response.data.data.content;
         setTotalPages(response.data.data.totalPages);
         setTotalElements(response.data.data.totalElements);
-        console.log(totalPages);
         setEvents(events);
         setLoading(false);
       } catch (error) {
@@ -128,6 +131,7 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
       try {
         const response = await axios.get(`${API_URL.BASE_URL_LOCAL}${API_URL.endpoints.eventPublic}/${selectedEventID}`);
         setSelectedEvent(response.data.data);
+        setPromotions(response.data.data.promotions);
       } catch (error: unknown) {
         setError(error);
       }
@@ -180,7 +184,9 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
       setLocation,
       createEvent,
       ticketQty,
-      setTicketQty
+      setTicketQty,
+      promotions,
+      setPromotions
     }}>
       {children}
     </EventContext.Provider>

@@ -108,7 +108,7 @@ const EventDetailPage = () => {
               <div key={ticketType.id} className='p-4 rounded-xl border-neutral-300 border-solid border-[1px] flex justify-between'>
                 <div className='flex flex-col gap-2.5'>
                   <label className='font-medium'>{ticketType.name}</label>
-                  <p className='text-red-700 font-medium'>IDR {ticketType.price}</p>
+                  <p className='text-red-700 font-medium'>IDR {(ticketType.price).toLocaleString('de-DE')}</p>
                 </div>
                 <div className='flex gap-4 items-center'>
                   <Button
