@@ -68,9 +68,13 @@ const EventCard: FC<EventProps> = ({ name, date, venue, location, startingPrice,
           {venue}, {location}
         </CardDescription>
       </CardContent>
-      <CardFooter className="text-base pb-4">
-        From IDR {Math.floor(startingPrice / 1000)}K
-      </CardFooter>
+      {startingPrice > 0 || null
+        ? <CardFooter className="text-base pb-4">
+          From IDR {Math.floor(startingPrice / 1000)}K </CardFooter>
+        : <CardFooter className="text-base pb-4">
+          Free </CardFooter>
+      }
+
     </Card>
   )
 }

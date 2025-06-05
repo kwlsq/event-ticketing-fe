@@ -11,9 +11,13 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 type DatePickerProps = {
   value?: Date;
   onChange: (date: Date | undefined) => void;
+  maxDate?: Date
 };
 
-const DatePicker = ({ value, onChange }: DatePickerProps) => {
+const DatePicker = ({ value, onChange, maxDate }: DatePickerProps) => {
+
+  const today = new Date();
+
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -30,14 +34,28 @@ const DatePicker = ({ value, onChange }: DatePickerProps) => {
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="start">
-        <Calendar
-          mode="single"
-          selected={value}
-          onSelect={onChange}
-          disabled={(date) => date < new Date("1900-01-01")
-          }
-          initialFocus
-        />
+        {maxDate
+          ?
+          // For selling date
+          <Calendar
+            mode="single"
+            selected={value}
+            onSelect={onChange}
+            disabled={(date) => date < new Date(today.setHours(0, 0, 0, 0)) || date > maxDate
+            }
+            initialFocus
+          />
+          :
+          // For event date
+          <Calendar
+            mode="single"
+            selected={value}
+            onSelect={onChange}
+            disabled={(date) => date < new Date(today.setHours(0, 0, 0, 0))
+            }
+            initialFocus
+          />
+        }
       </PopoverContent>
     </Popover>
   );
