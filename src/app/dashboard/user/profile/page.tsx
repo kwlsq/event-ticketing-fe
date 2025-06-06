@@ -1,3 +1,5 @@
+import ProfileUpdate from "../../components/ProfileUpdate";
+
 export default function UserProfilePage() {
-  return <div>user profile</div>;
+  return <ProfileUpdate></ProfileUpdate>;
 }

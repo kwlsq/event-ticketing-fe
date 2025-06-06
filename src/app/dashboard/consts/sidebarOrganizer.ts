@@ -3,7 +3,7 @@ import { UserRoundPen, List, ChartLine } from "lucide-react";
 
 export const sidebarOrganizer: Array<ListMenuItem> = [
     {
-        title: "Personal Info",
+        title: "Organizer Info",
         url: "profile",
         icon: UserRoundPen
     },
