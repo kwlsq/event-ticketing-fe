@@ -67,8 +67,8 @@ export default function ProfileUpdate() {
   };
 
   return (
-    <div className="flex flex-col px-4 sm:px-8 md:px-16 max-w-3xl mx-auto py-6">
-      <div className="font-semibold text-2xl sm:text-3xl md:text-4xl mb-8">
+    <div className="flex flex-col">
+      <div className="font-medium text-2xl sm:text-3xl md:text-4xl mb-8">
         Organizer info
       </div>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
@@ -86,7 +86,9 @@ export default function ProfileUpdate() {
               className="border border-gray-300 p-2 rounded text-black text-sm w-full"
             />
             {errors.name && (
-              <span className="text-red-500 text-sm">{errors.name.message}</span>
+              <span className="text-red-500 text-sm">
+                {errors.name.message}
+              </span>
             )}
           </div>
         </div>
@@ -106,7 +108,9 @@ export default function ProfileUpdate() {
                 className="border border-gray-300 p-2 rounded text-black text-sm w-full"
               />
               {errors.email && (
-                <span className="text-red-500 text-sm">{errors.email.message}</span>
+                <span className="text-red-500 text-sm">
+                  {errors.email.message}
+                </span>
               )}
             </div>
             <div className="flex flex-col gap-2">
@@ -119,7 +123,9 @@ export default function ProfileUpdate() {
                 className="border border-gray-300 p-2 rounded text-black text-sm w-full"
               />
               {errors.msisdn && (
-                <span className="text-red-500 text-sm">{errors.msisdn.message}</span>
+                <span className="text-red-500 text-sm">
+                  {errors.msisdn.message}
+                </span>
               )}
             </div>
           </div>
