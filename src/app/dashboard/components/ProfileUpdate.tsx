@@ -16,6 +16,7 @@ const formSchema = z.object({
 });
 
 type FormData = z.infer<typeof formSchema>;
+
 export default function ProfileUpdate() {
   const { data: session } = useSession();
   const { userDetail, setUserDetail } = useUserContext();
@@ -58,76 +59,79 @@ export default function ProfileUpdate() {
       await udpateProfile(session, userRequest);
       setUserDetail(userRequest);
       setIsLoading(false);
-      console.log(userDetail);
-
       toast.success("Update profile successful!");
     } catch (err) {
       toast.error("Update profile failed!");
       console.error("Error:", err);
     }
   };
+
   return (
-    <div className="flex flex-col">
-      <div className="font-medium md:text-4xl mb-8">Organizer info</div>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="grid grid-cols-3 mb-10">
-          <div className="flex flex-col gap-2">
-            <div className="font-medium text-xl">Profile</div>
-            <div className="text-gray-500">Description</div>
+    <div className="flex flex-col px-4 sm:px-8 md:px-16 max-w-3xl mx-auto py-6">
+      <div className="font-semibold text-2xl sm:text-3xl md:text-4xl mb-8">
+        Organizer info
+      </div>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+        <div className="flex flex-col gap-4 md:grid md:grid-cols-3 md:gap-6">
+          <div className="md:col-span-1">
+            <div className="font-medium text-lg md:text-xl">Profile</div>
+            <div className="text-gray-500 text-sm">Description</div>
           </div>
-          <div className="col-span-2">
+          <div className="md:col-span-2 flex flex-col gap-2">
             <input
               id="name"
-              type="name"
-              placeholder="name"
+              type="text"
+              placeholder="Name"
               {...register("name")}
               className="border border-gray-300 p-2 rounded text-black text-sm w-full"
             />
             {errors.name && (
-              <span className="text-red-500">{errors.name.message}</span>
+              <span className="text-red-500 text-sm">{errors.name.message}</span>
             )}
           </div>
         </div>
 
-        <div className="grid grid-cols-3 mb-8">
-          <div className="flex flex-col gap-2">
-            <div className="font-medium text-xl">Account</div>
-            <div className="text-gray-500">Description</div>
+        <div className="flex flex-col gap-4 md:grid md:grid-cols-3 md:gap-6">
+          <div className="md:col-span-1">
+            <div className="font-medium text-lg md:text-xl">Account</div>
+            <div className="text-gray-500 text-sm">Description</div>
           </div>
-          <div className="col-span-2">
-            <input
-              id="email"
-              type="email"
-              placeholder="email"
-              {...register("email")}
-              className="border border-gray-300 p-2 rounded text-black text-sm w-full"
-            />
-            {errors.email && (
-              <span className="text-red-500">{errors.email.message}</span>
-            )}
-          </div>
-          <div className="col-start-2 col-span-2">
-            <input
-              id="msisdn"
-              type="msisdn"
-              placeholder="phone number"
-              maxLength={16}
-              {...register("msisdn")}
-              className="border border-gray-300 p-2 rounded text-black text-sm w-full"
-            />
-            {errors.msisdn && (
-              <span className="text-red-500">{errors.msisdn.message}</span>
-            )}
+          <div className="md:col-span-2 flex flex-col gap-4">
+            <div className="flex flex-col gap-2">
+              <input
+                id="email"
+                type="email"
+                placeholder="Email"
+                {...register("email")}
+                className="border border-gray-300 p-2 rounded text-black text-sm w-full"
+              />
+              {errors.email && (
+                <span className="text-red-500 text-sm">{errors.email.message}</span>
+              )}
+            </div>
+            <div className="flex flex-col gap-2">
+              <input
+                id="msisdn"
+                type="tel"
+                placeholder="Phone number"
+                maxLength={16}
+                {...register("msisdn")}
+                className="border border-gray-300 p-2 rounded text-black text-sm w-full"
+              />
+              {errors.msisdn && (
+                <span className="text-red-500 text-sm">{errors.msisdn.message}</span>
+              )}
+            </div>
           </div>
         </div>
 
-        <div className="flex justify-end">
-          {error && <span className="text-red-500">{error}</span>}
+        <div className="flex flex-col md:justify-end sm:flex-row justify-between items-start sm:items-center">
+          {error && <span className="text-red-500 text-sm mb-2">{error}</span>}
           <Button
             disabled={isLoading}
             type="submit"
             size="action"
-            className="w-fit p-4"
+            className="w-full sm:w-auto px-6 py-3"
           >
             {isLoading ? "Loading..." : "Update profile"}
           </Button>

@@ -1,7 +1,13 @@
 "use client";
 
 import { DashboardData } from "@/types/dashboard/Dashboard";
-import { CartesianGrid, Line, LineChart, XAxis } from "recharts";
+import {
+  CartesianGrid,
+  Line,
+  LineChart,
+  XAxis,
+  ResponsiveContainer,
+} from "recharts";
 import {
   ChartConfig,
   ChartContainer,
@@ -10,7 +16,7 @@ import {
 } from "@/components/ui/chart";
 
 interface DashboardChartProps {
-  dashboardData?: DashboardData | undefined;
+  dashboardData?: DashboardData;
   dashboardFilter: string;
 }
 
@@ -29,32 +35,35 @@ export default function DashboardChart({
   console.log(dashboardFilter);
 
   return (
-    <ChartContainer config={chartConfig} className="md:h-[400px] w-full mt-2">
-      <LineChart accessibilityLayer data={chartData}>
-        <CartesianGrid vertical={false} />
-        <XAxis
-          dataKey="paymentDate"
-          tickLine={true}
-          tickMargin={10}
-          axisLine={true}
-          interval={1}
-          textAnchor="start"
-          tickFormatter={(value) => value.split("T")[0]}
-        />
-        <ChartTooltip
-          labelFormatter={(value) => value.split("T")[0]}
-          content={<ChartTooltipContent />}
-        />
-        <Line
-          type="monotone"
-          dataKey="finalAmount"
-          fill="var(--color-desktop)"
-          radius={4}
-          strokeWidth={2}
-          stroke="#1890ff"
-          dot={{ r: 4 }}
-        />
-      </LineChart>
+    <ChartContainer
+      config={chartConfig}
+      className="w-full mt-2 h-[300px] md:h-[400px]"
+    >
+      <ResponsiveContainer width="100%" height="100%">
+        <LineChart data={chartData}>
+          <CartesianGrid vertical={false} />
+          <XAxis
+            dataKey="paymentDate"
+            tickLine={true}
+            tickMargin={10}
+            axisLine={true}
+            interval={0}
+            minTickGap={20}
+            tickFormatter={(value) => value.split("T")[0]}
+          />
+          <ChartTooltip
+            labelFormatter={(value) => value.split("T")[0]}
+            content={<ChartTooltipContent />}
+          />
+          <Line
+            type="monotone"
+            dataKey="finalAmount"
+            stroke="#1890ff"
+            strokeWidth={2}
+            dot={{ r: 4 }}
+          />
+        </LineChart>
+      </ResponsiveContainer>
     </ChartContainer>
   );
 }
