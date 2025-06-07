@@ -19,7 +19,7 @@ export interface EventTicketType {
   price: number, 
   stock: number, 
   availableQty: number, 
-  sellDate: string
+  date: string
 }
 
 export interface EventDetailsProps {

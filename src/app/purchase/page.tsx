@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { useEvents } from "../context/use-event";
 import PlusIcon from '../../../public/icon/Plus Icon.svg';
 import MinusIcon from '../../../public/icon/Minus Icon.svg';
-import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { z } from 'zod';
@@ -14,6 +13,7 @@ import { useForm } from "react-hook-form";
 import { usePointsContext } from "../context/pointsContext";
 import PointIcon from "../../../public/icon/point.svg";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { cn } from "@/lib/utils";
 
 const creditCardSchema = z.object({
   holderName: z.string().min(1, { message: "Event name cannot be empty!" }).min(5, { message: "Should be more than 5 characters" }),
@@ -144,7 +144,7 @@ const PurchasePage = () => {
                     <label className='font-medium'>{ticketType.name}</label>
                     <p className="text-neutral-500">{selectedEvent.name}</p>
                   </div>
-                  <p className='text-red-700 font-medium'>IDR {ticketType.price}</p>
+                  <p className='text-red-700 font-medium'>IDR {(ticketType.price).toLocaleString('de-DE')}</p>
                 </div>
                 <div className='flex gap-4 items-center'>
                   <Button
@@ -209,7 +209,7 @@ const PurchasePage = () => {
                     Your unused voucher
                   </SelectLabel>
                   <SelectItem value="Music">
-                    <div>
+                    <div className={cn("", promotions === undefined && "hidden" )}>
                       <label>{promotions?.name}</label>
                       {promotions?.type === "NOMINAL"
                       ? <p>Get Rp. {promotions?.value} cashback from your purchase</p>

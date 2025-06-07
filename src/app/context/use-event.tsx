@@ -28,7 +28,7 @@ interface EventContextType {
   location: string,
   ticketQty: Record<number, number>,
   promotions: PromotionProps | null
-  
+
   setSelectedEventID: (selectedEventID: number) => void,
   setSelectedEvent: (selectedEvent: EventDetailsProps | null) => void,
   setTotalPages: (totalPages: number) => void,
@@ -42,6 +42,7 @@ interface EventContextType {
   setPromotions: (promotion: PromotionProps) => void
 
   createEvent: (newEvent: EventRequest, accessToken: string) => Promise<EventDetailsProps | undefined>
+  uploadImage: (file: File[], accessToken: string, eventID: number) => Promise<boolean>
 }
 
 const EventContext = createContext<EventContextType | undefined>(undefined);
@@ -159,6 +160,32 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  // Upload image to cloud
+  const uploadImage = async (files: File[], accessToken: string, eventID: number): Promise<boolean> => {
+    try {
+      const formData = new FormData();
+      files.forEach((file) => {
+        formData.append("multipartFiles", file);
+      });
+
+      const res = await axios.post(
+        `${API_URL.BASE_URL_LOCAL}${API_URL.endpoints.image}/${eventID}`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      return res.status === 200;
+    } catch (err) {
+      console.error("Image upload failed:", err);
+      return false;
+    }
+  }
+
   return (
     <EventContext.Provider value={{
       events,
@@ -186,7 +213,8 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
       ticketQty,
       setTicketQty,
       promotions,
-      setPromotions
+      setPromotions,
+      uploadImage
     }}>
       {children}
     </EventContext.Provider>
