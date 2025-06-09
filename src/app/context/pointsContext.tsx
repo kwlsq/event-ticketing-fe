@@ -38,13 +38,13 @@ export const PointsProvider: FC<{ children: ReactNode }> = ({ children }) => {
     } catch (error) {
       console.error(error);
     }
-  }, [session]);
+  }, [session?.accessToken]);
 
   useEffect(() => {
     if (session) {
       updateTotalPoints();
     }
-  }, [session, updateTotalPoints]);
+  }, [session?.accessToken, updateTotalPoints]);
 
   return (
     <PointsContext.Provider

@@ -42,7 +42,7 @@ const Navbar = ({ searchParams }: { searchParams: URLSearchParams }) => {
       const role = session.user.roles[0].split("_")[1];
       setUserDetail({ name, email, nameInitial, role });
     }
-  }, [session]);
+  }, [session?.accessToken]);
 
   const handleClickOpenDialog = useCallback(
     (val: boolean) => {

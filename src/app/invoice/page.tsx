@@ -1,5 +1,6 @@
 "use client"
 
+import { InvoiceItemsResponse } from "@/types/invoice/invoice";
 import { useInvoice } from "../context/use-invoice";
 
 const InvoicePage = () => {
@@ -65,7 +66,7 @@ const InvoicePage = () => {
               </tr>
             </thead>
             <tbody>
-              {invoice?.invoiceItems.map((item, index) => (
+              {invoice?.invoiceItems.map((item: InvoiceItemsResponse, index: number) => (
                 <tr key={item.ticketTypeResponse.id}>
                   <td className="px-3 py-2">{index + 1}</td>
                   <td className="px-3 py-2 text-left">{item.ticketTypeResponse.name}</td>

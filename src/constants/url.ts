@@ -2,7 +2,7 @@ export const API_URL = {
   BASE_URL:
     process.env.NEXT_PUBLIC_API_BASE_URL ||
     "https://event-ticketing-be-871456516315.asia-southeast2.run.app/api/v1",
-    BASE_URL_LOCAL:
+  BASE_URL_LOCAL:
     process.env.NEXT_PUBLIC_BACKEND_URL,
   endpoints: {
     eventPublic: '/api/v1/event/public',
@@ -22,8 +22,11 @@ export const API_URL = {
     detail: "/api/v1/user",
     register: "/api/v1/user/register"
   },
-  points:{
+  points: {
     totalPoints: "/api/v1/point"
   },
-  dashboard: "/api/v1/dashboard"
+  dashboard: {
+    dashboardData: "/api/v1/dashboard",
+    dashboardEvent: "/api/v1/dashboard/events"
+  }
 };

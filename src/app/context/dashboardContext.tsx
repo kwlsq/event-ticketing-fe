@@ -1,6 +1,10 @@
 "use client";
 
-import { DashboardApiResponse, DashboardFilter } from "@/types/dashboard/Dashboard";
+import {
+  DashboardSummaryApiResponse,
+  DashboardFilter,
+  PaginatedEventsApiResponse,
+} from "@/types/dashboard/Dashboard";
 import {
   createContext,
   FC,
@@ -10,13 +14,18 @@ import {
   useEffect,
   useState,
 } from "react";
-import { getDashboardData } from "../services/dashboardService";
+import {
+  getAllOwnedEvents,
+  getDashboardData,
+} from "../services/dashboardService";
 import { useSession } from "next-auth/react";
 
 interface DashboardContextType {
-  dashboardData: DashboardApiResponse | undefined;
+  dashboardData: DashboardSummaryApiResponse | undefined;
+  dashboardEventsData: PaginatedEventsApiResponse | undefined;
   dashboardFilter: DashboardFilter;
   setDashboardFilter: (filter: DashboardFilter) => void;
+  updateDashboardEventsData: (page: number, size: number) => void;
 }
 
 const DashboardContext = createContext<DashboardContextType | undefined>(
@@ -36,6 +45,7 @@ export const DashboardProvider: FC<{ children: ReactNode }> = ({
 }) => {
   const { data: session } = useSession();
 
+  const [dashboardEventsData, setDashboardEventsData] = useState();
   const [dashboardData, setDashboardData] = useState();
   const [dashboardFilter, setDashboardFilter] =
     useState<DashboardFilter>("yearly");
@@ -49,21 +59,41 @@ export const DashboardProvider: FC<{ children: ReactNode }> = ({
         console.error(error);
       }
     },
-    [session]
+    [session?.accessToken]
   );
 
   useEffect(() => {
     if (session) {
       updateDashboardData(dashboardFilter);
     }
-  }, [session, dashboardFilter, updateDashboardData]);
+  }, [session?.accessToken, dashboardFilter, updateDashboardData]);
+
+  const updateDashboardEventsData = useCallback(
+    async (page: number, size: number) => {
+      try {
+        const data = await getAllOwnedEvents(session, page, size);
+        setDashboardEventsData(data);
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    [session?.accessToken]
+  );
+
+  useEffect(() => {
+    if (session) {
+      updateDashboardEventsData(0, 5);
+    }
+  }, [session?.accessToken, updateDashboardEventsData]);
 
   return (
     <DashboardContext.Provider
       value={{
         dashboardData,
+        dashboardEventsData,
         dashboardFilter,
         setDashboardFilter,
+        updateDashboardEventsData,
       }}
     >
       {children}
