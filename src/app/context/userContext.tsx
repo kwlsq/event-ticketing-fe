@@ -1,16 +1,25 @@
 "use client";
 
 import { ROLE } from "@/constants/userConstants";
-import { createContext, FC, ReactNode, useContext, useState } from "react";
+import { UserData } from "@/types/user/user";
+import {
+  createContext,
+  FC,
+  ReactNode,
+  useContext,
+  useState,
+} from "react";
 
 interface UserContextType {
   isOpenDialog: boolean | false;
   isRegister: boolean | false;
   isOpenPopOver: boolean | false;
+  userDetail: UserData | undefined;
   updateIsOpenDialog: (val: boolean) => void;
   updateIsRegister: (val: boolean) => void;
   updateIsOpenPopOver: (val: boolean) => void;
   isOrganizer: (val: string | undefined) => boolean;
+  setUserDetail: (val: UserData) => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -27,6 +36,7 @@ export const UserProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const [isOpenDialog, setIsOpenDialog] = useState<boolean>(false);
   const [isRegister, setIsRegister] = useState<boolean>(false);
   const [isOpenPopOver, setIsOpenPopOver] = useState<boolean>(false);
+  const [userDetail, setUserDetail] = useState<UserData>();
 
   const updateIsOpenDialog = (val: boolean) => {
     setIsOpenDialog(val);
@@ -57,6 +67,8 @@ export const UserProvider: FC<{ children: ReactNode }> = ({ children }) => {
         isOpenPopOver,
         updateIsOpenPopOver,
         isOrganizer,
+        userDetail,
+        setUserDetail
       }}
     >
       {children}

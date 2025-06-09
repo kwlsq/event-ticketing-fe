@@ -54,7 +54,11 @@ const ProfilePopOver: React.FC<Props> = ({
       </PopoverTrigger>
       <PopoverContent align="end">
         <div className="px-5 py-3 rounded-2xl bg-linear-to-r from-blue-500 to-blue-800 text-white">
-          <div className="flex justify-between items-center border-b-1 border-[#5499E3] pb-2">
+          <div
+            className={`flex justify-between items-center ${
+              userDetail.role === "user" ? `border-b-1` : ``
+            } border-[#5499E3] pb-2`}
+          >
             <div>
               <div className="font-bold text-sm">{userDetail.name}</div>
               <div className="text-xs">{userDetail.email}</div>
@@ -71,19 +75,22 @@ const ProfilePopOver: React.FC<Props> = ({
               />
             </Link>
           </div>
-          <div className="flex gap-2 items-center mt-2">
-            <div>
-              <Image
-                src="/icon/point.svg"
-                alt="point's icon"
-                height={20}
-                width={20}
-              />
+
+          {userDetail.role === "user" ? (
+            <div className="flex gap-2 items-center mt-2">
+              <div>
+                <Image
+                  src="/icon/point.svg"
+                  alt="point's icon"
+                  height={20}
+                  width={20}
+                />
+              </div>
+              <div className="font-semibold">
+                {totalPoints.toLocaleString("id-ID")} Points
+              </div>
             </div>
-            <div className="font-semibold">
-              {totalPoints.toLocaleString("id-ID")} Points
-            </div>
-          </div>
+          ) : null}
         </div>
         <Button
           variant="text"
