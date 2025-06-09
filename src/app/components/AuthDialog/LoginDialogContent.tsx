@@ -21,7 +21,6 @@ const LoginDialogContent = () => {
   const { data: session } = useSession({
     required: true,
     onUnauthenticated: () => {
-      console.log(session);
       console.log("Session expired, opening login dialog...");
       // setopenDialog(true);
     },
