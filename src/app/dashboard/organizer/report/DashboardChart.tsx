@@ -29,11 +29,9 @@ const chartConfig = {
 
 export default function DashboardChart({
   dashboardData,
-  dashboardFilter,
 }: DashboardChartProps) {
   const { chartData } = dashboardData || {};
   const isEmpty = !chartData || chartData.length === 0;
-  console.log(dashboardFilter);
 
   return (
     <ChartContainer
@@ -53,7 +51,7 @@ export default function DashboardChart({
               tickLine={true}
               tickMargin={10}
               axisLine={true}
-              interval={0}
+              interval={1}
               minTickGap={20}
               tickFormatter={(value) => value.split("T")[0]}
             />
