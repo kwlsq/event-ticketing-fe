@@ -18,6 +18,7 @@ import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { ChangeEvent, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const sortLabels: Record<string, string> = {
   name: "Sort by Name",
@@ -40,7 +41,7 @@ const debounce = <T extends (...args: any[]) => void>(
 }
 
 export default function Home() {
-  const { events, totalPages, setSort, sort, query, setQuery, totalElements, setPage, regencies, location, setLocation } = useEvents();
+  const { events, totalPages, setSort, sort, query, setQuery, totalElements, setPage, regencies, location, setLocation, categories, category, setCategory } = useEvents();
   const [searchQuery, setSearchQuery] = useState(query);
   const router = useRouter();
 
@@ -129,6 +130,30 @@ export default function Home() {
             </Select>
           </div>
         </div>
+
+        {/* Category tab */}
+        <Tabs
+        value={String(category?.id)}
+        onValueChange={(value) => {
+          const selectedCategory = categories?.find((category) => String(category.id) === value);
+          if(selectedCategory) setCategory(selectedCategory);
+        }
+        }>
+          <TabsList className="w-full p-0 bg-background justify-start border-b rounded-none shadow-none">
+            {categories?.map((category) => (
+              <TabsTrigger
+                key={category.id}
+                value={String(category.id)}
+                className="rounded-none bg-background h-full shadow-none border-b-0 
+             text-neutral-400 font-semibold 
+             data-[state=active]:border-0 data-[state=active]:border-b-2 data-[state=active]:border-primary 
+             data-[state=active]:text-primary"
+              >
+                {category.name}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </Tabs>
 
         {/* Filter button & title */}
         <div className="flex justify-end w-full items-end">

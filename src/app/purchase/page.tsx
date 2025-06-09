@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 import { useInvoice } from "../context/use-invoice";
 import { useSession } from "next-auth/react";
 import { InvoiceItemsRequest, InvoiceRequest } from "@/types/invoice/invoice";
+import { useRouter } from "next/navigation";
 
 const PurchasePage = () => {
 
@@ -24,6 +25,7 @@ const PurchasePage = () => {
   const { totalPoints } = usePointsContext();
   const { createInvoice } = useInvoice();
   const { data: session } = useSession();
+  const router = useRouter();
 
   const handleTicketMinus = (id: number) => {
     setTicketQty((prev) => ({
@@ -75,11 +77,13 @@ const PurchasePage = () => {
       pointAmount: isUsePoint ? totalPoints : 0,
       promotionID: selectedPromotion
     }
-    console.log(invoiceRequest);
 
     try {
       const response = await createInvoice(invoiceRequest, session?.accessToken, selectedEvent?.id);
-      if (response) return console.log("Successfully create invoice!");
+      if (response) {
+        console.log("Successfully create invoice!");
+        router.push("/invoice");
+      }
     } catch (error) {
       console.error("Failed to proceed invoice", error);
     }
