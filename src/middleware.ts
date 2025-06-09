@@ -49,7 +49,13 @@ export async function middleware(request: NextRequest) {
 
   if (isProtectedPath(pathname)) {
     if (!session) {
-      return NextResponse.redirect(new URL(`${pathname}?login=true`, request.url));
+      const isLoginRedirect = request.nextUrl.searchParams.get("login") === "true";
+      if (!isLoginRedirect) {
+        const loginUrl = new URL(request.url);
+        loginUrl.searchParams.set("login", "true");
+        return NextResponse.redirect(loginUrl);
+      }
+      return NextResponse.next(); 
     }
 
     const userRoles = session.user?.roles || [];

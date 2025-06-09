@@ -14,7 +14,6 @@ export interface PaginatedEventsApiResponse {
   data: PaginatedEvents;
 }
 
-
 export interface ListMenuItem {
     title: string;
     url: string;

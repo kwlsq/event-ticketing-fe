@@ -6,6 +6,24 @@ enum PaymentStatus {
   FAILED = "FAILED",
   REFUND = "REFUND"
 }
+
+export interface PaginatedInvoiceApiResponse {
+  success: boolean;
+  statusCode: number;
+  message: string;
+  data: PaginatedInvoices;
+}
+
+export interface PaginatedInvoices {
+    page: number;
+    size: number;
+    totalElements: number;
+    totalPages: number;
+    hasNext: boolean;
+    hasPrevious: boolean;
+    content: InvoiceResponseProps[]; 
+}
+
 export interface InvoiceResponseProps {
   id: number,
   event: EventProps,
@@ -18,7 +36,7 @@ export interface InvoiceResponseProps {
   fees: number,
   finalAmount: number,
   pointUsed: number,
-  eventDetails: EventDetailsProps,
+  eventDetailsResponse: EventDetailsProps,
   invoiceItems: InvoiceItemsResponse[],
 }
 
