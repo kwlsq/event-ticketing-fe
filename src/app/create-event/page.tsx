@@ -16,6 +16,8 @@ import Image from "next/image"
 import { useEvents } from "../context/use-event"
 import axios from "axios"
 import { API_URL } from "@/constants/url"
+import { toast } from "sonner";
+import { subDays } from "date-fns"
 
 const ticketTypeSchema = z.object({
   name: z.string().min(1, { message: "Name cannot be empty!" }),
@@ -25,7 +27,7 @@ const ticketTypeSchema = z.object({
 
 enum PromotionType {
   Percentage = "PERCENTAGE",
-  Nominal= "NOMINAL"
+  Nominal = "NOMINAL"
 }
 
 const eventFormSchema = z.object({
@@ -67,7 +69,13 @@ export default function CreateEvent() {
     resolver: zodResolver(eventFormSchema),
     defaultValues: {
       ticketTypeRequest: [],
-      isEventFree: true
+      isEventFree: true,
+      eventPromotion: {
+        name: "Early Bird",
+        type: PromotionType.Percentage,
+        isReferralPromotion: true
+      },
+      location: ""
     }
   });
 
@@ -77,6 +85,10 @@ export default function CreateEvent() {
   })
 
   const watchType = watch("isEventFree");
+  const watchDate = watch("date");
+
+  // Calculate maxSelling date (maximum selling date is 3 days before event date)
+  const maxTicketSaleDate = watchDate ? subDays(new Date(watchDate), 3) : undefined;
 
   useEffect(() => {
     if (watchType) {
@@ -104,7 +116,8 @@ export default function CreateEvent() {
 
   const onSubmit = async (data: EventForm) => {
     try {
-      let imageUploadResponse = null;
+
+      console.log(data);
 
       const formData = new FormData();
 
@@ -138,13 +151,10 @@ export default function CreateEvent() {
           }
         );
 
-        imageUploadResponse = res.data;
+        if (res.status === 200) {
+          toast.success("Successfully create event!");
+        }
       }
-
-      // Send event + image data to your own event creation endpoint here (if needed)
-      console.log("Event form data:", data);
-      console.log("Uploaded image URLs:", imageUploadResponse.url);
-
     } catch (err) {
       console.error("Upload failed:", err);
     }
@@ -205,7 +215,7 @@ export default function CreateEvent() {
                   name="date"
                   render={({ field }) => (
                     <DatePicker
-                      value={field.value}
+                      value={field.value ?? ""}
                       onChange={field.onChange}
                     />
                   )}
@@ -225,8 +235,9 @@ export default function CreateEvent() {
                   name="ticketSaleDate"
                   render={({ field }) => (
                     <DatePicker
-                      value={field.value}
+                      value={field.value ?? ""}
                       onChange={field.onChange}
+                      maxDate={maxTicketSaleDate}
                     />
                   )}
                 />
@@ -260,7 +271,7 @@ export default function CreateEvent() {
                     name="location"
                     render={({ field }) => (
                       <Select
-                        value={field.value}
+                        value={field.value ?? ""}
                         onValueChange={field.onChange}
                       >
                         <SelectTrigger className="w-full">
@@ -296,7 +307,7 @@ export default function CreateEvent() {
                   name="isEventFree"
                   render={({ field }) => (
                     <Select
-                      value={field.value?.toString()}
+                      value={field.value?.toString() ?? ""}
                       onValueChange={(val) => field.onChange(val === "true")}
                     >
                       <SelectTrigger className="w-full">
@@ -421,20 +432,50 @@ export default function CreateEvent() {
           <div className="flex flex-col gap-4 p-6 border border-neutral-300 rounded-xl">
             <div className="flex flex-col">
               <label className="text-xl font-medium">
-                Promotion <span className="text-red-500">*</span>
+                Promotion
               </label>
               <p className="text-sm">Add promotion to boost sales</p>
             </div>
             <div className="flex flex-col gap-3">
+              {/* Input promotion name */}
+              <div className="flex flex-col gap-3">
+                <label className="text-sm font-medium">
+                  Name
+                </label>
+                <div className="flex flex-col gap-1">
+                  <Input
+                    placeholder="Promotion name"
+                    {...register("eventPromotion.name")}
+                    className={`border ${errors.eventPromotion?.name && 'border-red-500'}`}
+                  />
+                  {errors.eventPromotion?.name && <p className="text-red-500 text-xs">{errors.eventPromotion?.name.message}</p>}
+                </div>
+              </div>
+              {/* Input promotion description */}
+              <div className="flex flex-col gap-3">
+                <label className="text-sm font-medium">
+                  Description
+                </label>
+                <div className="flex flex-col gap-1">
+                  <Input
+                    placeholder="Promotion description"
+                    {...register("eventPromotion.description")}
+                    className={`border ${errors.eventPromotion?.description && 'border-red-500'}`}
+                  />
+                  {errors.eventPromotion?.description && <p className="text-red-500 text-xs">{errors.eventPromotion?.description.message}</p>}
+                </div>
+              </div>
               <div className="flex gap-2">
+                {/* Input promotion value */}
                 <div className="flex flex-col gap-3 w-3/5">
                   <label className="text-sm font-medium">
-                    Value <span className="text-red-500">*</span>
+                    Value
                   </label>
                   <div className="flex flex-col gap-1">
                     <Input
-                      placeholder="Event name"
-                      {...register("name")}
+                      type="number"
+                      placeholder="Promotion value"
+                      {...register("eventPromotion.value", { valueAsNumber: true })}
                       className={`border ${errors.eventPromotion?.value && 'border-red-500'}`}
                     />
                     {errors.eventPromotion?.value && <p className="text-red-500 text-xs">{errors.eventPromotion?.value.message}</p>}
@@ -451,7 +492,7 @@ export default function CreateEvent() {
                     name="eventPromotion.type"
                     render={({ field }) => (
                       <Select
-                        value={field.value}
+                        value={field.value ?? ""}
                         onValueChange={field.onChange}
                       >
                         <SelectTrigger className="w-full">
@@ -466,6 +507,50 @@ export default function CreateEvent() {
                       </Select>
                     )}
                   />
+                </div>
+              </div>
+              <div className="flex gap-2">
+                {/* Voucher max usage */}
+                <div className="flex flex-col gap-3 w-3/5">
+                  <label className="text-sm font-medium">
+                    Max usage
+                  </label>
+                  <div className="flex flex-col gap-1">
+                    <Input
+                      type="number"
+                      placeholder="Voucher stocks"
+                      {...register("eventPromotion.maxUsage", { valueAsNumber: true })}
+                      className={`border ${errors.eventPromotion?.maxUsage && 'border-red-500'}`}
+                    />
+                    {errors.eventPromotion?.maxUsage && <p className="text-red-500 text-xs">{errors.eventPromotion?.maxUsage.message}</p>}
+                  </div>
+                </div>
+                <div className="w-2/5">
+                  <div className="flex flex-col gap-3 w-full">
+                    <label className="text-sm font-medium">
+                      Referral promotion <span className="text-red-500">*</span>
+                    </label>
+                    <Controller
+                      control={control}
+                      name="eventPromotion.isReferralPromotion"
+                      render={({ field }) => (
+                        <Select
+                          value={field.value?.toString() ?? ""}
+                          onValueChange={(val) => field.onChange(val === "true")}
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Yes" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectGroup>
+                              <SelectItem value="true">Yes</SelectItem>
+                              <SelectItem value="false">No</SelectItem>
+                            </SelectGroup>
+                          </SelectContent>
+                        </Select>
+                      )}
+                    />
+                  </div>
                 </div>
               </div>
             </div>

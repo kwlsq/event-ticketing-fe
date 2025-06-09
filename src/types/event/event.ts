@@ -1,4 +1,5 @@
 import { Image } from "../image/image";
+import { PromotionProps } from "../promotion/promotion";
 import { Review } from "../review/review";
 
 export interface EventProps {
@@ -30,7 +31,8 @@ export interface EventDetailsProps {
   location: string,
   images: Image[],
   reviews: Review[],
-  eventTicketTypes: EventTicketType[]
+  eventTicketTypes: EventTicketType[],
+  promotions?: PromotionProps
 }
 
 export interface EventTicketTypeRequest {

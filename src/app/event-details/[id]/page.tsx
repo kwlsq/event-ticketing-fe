@@ -2,8 +2,8 @@
 
 import { useEvents } from '../../context/use-event';
 import Image from 'next/image';
-import { usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 import PlusIcon from '../../../../public/icon/Plus Icon.svg';
 import MinusIcon from '../../../../public/icon/Minus Icon.svg';
 import { Button } from '@/components/ui/button';
@@ -11,8 +11,8 @@ import { Button } from '@/components/ui/button';
 const EventDetailPage = () => {
 
   const eventID = usePathname();
-  const { selectedEvent, setSelectedEventID } = useEvents();
-  const [ticketQty, setTicketQty] = useState<Record<number, number>>({});
+  const router = useRouter();
+  const { selectedEvent, setSelectedEventID, ticketQty, setTicketQty } = useEvents();
 
   useEffect(() => {
     setSelectedEventID(parseInt(eventID.split("/")[2]));
@@ -42,6 +42,7 @@ const EventDetailPage = () => {
       })),
     };
     console.log(purchasePayload);
+    router.push('/purchase');
   }
 
   if (!selectedEvent?.date) return;
@@ -107,7 +108,7 @@ const EventDetailPage = () => {
               <div key={ticketType.id} className='p-4 rounded-xl border-neutral-300 border-solid border-[1px] flex justify-between'>
                 <div className='flex flex-col gap-2.5'>
                   <label className='font-medium'>{ticketType.name}</label>
-                  <p className='text-red-700 font-medium'>IDR {ticketType.price}</p>
+                  <p className='text-red-700 font-medium'>IDR {(ticketType.price).toLocaleString('de-DE')}</p>
                 </div>
                 <div className='flex gap-4 items-center'>
                   <Button
