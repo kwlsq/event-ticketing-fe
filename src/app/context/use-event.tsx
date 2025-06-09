@@ -6,7 +6,7 @@ import { ReactNode } from "react";
 import { EventProps, EventRequest, EventDetailsProps } from "@/types/event/event";
 import { API_URL } from "@/constants/url";
 import { useSearchParams } from "next/navigation";
-import { PromotionProps } from "@/types/promotion/promotion";
+import { PromotionProps, PromotionRequest } from "@/types/promotion/promotion";
 
 interface LocationProps {
   code: string;
@@ -28,7 +28,7 @@ interface EventContextType {
   location: string,
   ticketQty: Record<number, number>,
   promotions: PromotionProps | null
-  
+
   setSelectedEventID: (selectedEventID: number) => void,
   setSelectedEvent: (selectedEvent: EventDetailsProps | null) => void,
   setTotalPages: (totalPages: number) => void,
@@ -42,6 +42,8 @@ interface EventContextType {
   setPromotions: (promotion: PromotionProps) => void
 
   createEvent: (newEvent: EventRequest, accessToken: string) => Promise<EventDetailsProps | undefined>
+  uploadImage: (file: File[], accessToken: string, eventID: number) => Promise<boolean>
+  createPromotion: (promotionRequest: PromotionRequest, accessToken: string) => Promise<boolean>
 }
 
 const EventContext = createContext<EventContextType | undefined>(undefined);
@@ -159,6 +161,52 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  // Upload image to cloud
+  const uploadImage = async (files: File[], accessToken: string, eventID: number): Promise<boolean> => {
+    try {
+      const formData = new FormData();
+      files.forEach((file) => {
+        formData.append("multipartFiles", file);
+      });
+
+      const response = await axios.post(
+        `${API_URL.BASE_URL_LOCAL}${API_URL.endpoints.image}/${eventID}`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      return response.status === 200;
+    } catch (error) {
+      console.error("Image upload failed:", error);
+      return false;
+    }
+  }
+
+  // Create promotion if organizer add promotion in the event
+  const createPromotion = async (promotion: PromotionRequest, accessToken: string): Promise<boolean> => {
+    try {
+      const response = await axios.post(
+        `${API_URL.BASE_URL_LOCAL}${API_URL.endpoints.promotion}/create`,
+        promotion,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`
+          }
+        }
+      );
+
+      return response.status === 200;
+    } catch (error) {
+      console.error("Failed to create promotion:", error);
+      return false;
+    }
+  }
+
   return (
     <EventContext.Provider value={{
       events,
@@ -186,7 +234,9 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
       ticketQty,
       setTicketQty,
       promotions,
-      setPromotions
+      setPromotions,
+      uploadImage,
+      createPromotion
     }}>
       {children}
     </EventContext.Provider>
