@@ -28,3 +28,19 @@ export async function getAllOwnedEvents(session: TokenPair | null, page: number,
 
     return response.data;
 }
+
+export async function getInvoicesByID(session: TokenPair | null, page: number, size: number | 0) {
+    const auth = `Bearer ${session?.accessToken}`
+
+    const response = await axios.get(`${API_URL.BASE_URL_LOCAL}${API_URL.endpoints.invoice}`, {
+        params: {
+            page: page,
+            size: size
+        },
+        headers: {
+            Authorization: auth,
+        }
+    });
+
+    return response.data;
+}

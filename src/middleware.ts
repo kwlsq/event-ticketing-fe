@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { auth } from "@/auth";
 
-const PUBLIC_PATHS = ["/", "/event-details"];
+const PUBLIC_PATHS = ["/", "/event-details", "/invoice"];
 const ROLE_PATHS = {
   organizer: ["/dashboard/organizer", "/dashboard/organizer/*"],
   user: ["/dashboard/user", "/dashboard/user/*"],
@@ -49,7 +49,13 @@ export async function middleware(request: NextRequest) {
 
   if (isProtectedPath(pathname)) {
     if (!session) {
-      return NextResponse.redirect(new URL(`${pathname}?login=true`, request.url));
+      const isLoginRedirect = request.nextUrl.searchParams.get("login") === "true";
+      if (!isLoginRedirect) {
+        const loginUrl = new URL(request.url);
+        loginUrl.searchParams.set("login", "true");
+        return NextResponse.redirect(loginUrl);
+      }
+      return NextResponse.next(); 
     }
 
     const userRoles = session.user?.roles || [];

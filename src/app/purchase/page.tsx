@@ -5,34 +5,25 @@ import { Button } from "@/components/ui/button";
 import { useEvents } from "../context/use-event";
 import PlusIcon from '../../../public/icon/Plus Icon.svg';
 import MinusIcon from '../../../public/icon/Minus Icon.svg';
-import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
-import { z } from 'zod';
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
 import { usePointsContext } from "../context/pointsContext";
 import PointIcon from "../../../public/icon/point.svg";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { cn } from "@/lib/utils";
+import { useInvoice } from "../context/use-invoice";
+import { useSession } from "next-auth/react";
+import { InvoiceItemsRequest, InvoiceRequest } from "@/types/invoice/invoice";
 
-const creditCardSchema = z.object({
-  holderName: z.string().min(1, { message: "Event name cannot be empty!" }).min(5, { message: "Should be more than 5 characters" }),
-  number: z.string().min(1, { message: "Description cannot be empty!" }).max(255),
-  expiryDate: z.string(),
-  cvv: z.number()
-});
-
-export type CCForm = z.infer<typeof creditCardSchema>;
 const PurchasePage = () => {
 
   const { ticketQty, setTicketQty, selectedEvent, promotions } = useEvents();
   const [subtotal, setSubtotal] = useState(0);
+  const [selectedPromotion, setSelectedPromotion] = useState(0);
+  const [isUsePoint, setUsePoint] = useState(false);
   const { totalPoints } = usePointsContext();
-
-
-  const { register, formState: { errors }, } = useForm<CCForm>({
-    resolver: zodResolver(creditCardSchema)
-  });
+  const { createInvoice } = useInvoice();
+  const { data: session } = useSession();
 
   const handleTicketMinus = (id: number) => {
     setTicketQty((prev) => ({
@@ -52,7 +43,6 @@ const PurchasePage = () => {
     const calculateSubtotal = () => {
       let total = 0;
       selectedEvent?.eventTicketTypes.map((ticket) => {
-        // if qty is empty, its counted as 0
         const qty = ticketQty[ticket.id] || 0;
         if (qty > 0) {
           total += ticket.price * ticketQty[ticket.id]
@@ -62,6 +52,38 @@ const PurchasePage = () => {
     }
     calculateSubtotal();
   }, [ticketQty, selectedEvent?.eventTicketTypes])
+
+
+  if (!session) return;
+
+  const handleContinuePayment = async () => {
+
+    const invoiceItems: InvoiceItemsRequest[] = [];
+
+    selectedEvent?.eventTicketTypes.forEach(ticket => {
+      const qty = ticketQty[ticket.id] || 0;
+      if (qty > 0) {
+        invoiceItems.push({
+          eventTicketTypeID: ticket.id,
+          qty
+        })
+      }
+    })
+
+    const invoiceRequest: InvoiceRequest = {
+      invoiceItemRequests: invoiceItems,
+      pointAmount: isUsePoint ? totalPoints : 0,
+      promotionID: selectedPromotion
+    }
+    console.log(invoiceRequest);
+
+    try {
+      const response = await createInvoice(invoiceRequest, session?.accessToken, selectedEvent?.id);
+      if (response) return console.log("Successfully create invoice!");
+    } catch (error) {
+      console.error("Failed to proceed invoice", error);
+    }
+  }
 
   return (
     <div className="flex w-full px-40 py-9 gap-10">
@@ -81,10 +103,7 @@ const PurchasePage = () => {
               <div className="flex flex-col gap-1">
                 <Input
                   placeholder="Card holder name"
-                  {...register("holderName")}
-                  className={`border ${errors.holderName && 'border-red-500'}`}
                 />
-                {errors.holderName && <p className="text-red-500 text-xs">{errors.holderName.message}</p>}
 
               </div>
             </div>
@@ -95,10 +114,7 @@ const PurchasePage = () => {
               <div className="flex flex-col gap-1">
                 <Input
                   placeholder="16 digits card number"
-                  {...register("number")}
-                  className={`border ${errors.number && 'border-red-500'}`}
                 />
-                {errors.number && <p className="text-red-500 text-xs">{errors.number.message}</p>}
               </div>
             </div>
             <div className="flex gap-5">
@@ -109,10 +125,7 @@ const PurchasePage = () => {
                 <div className="flex flex-col gap-1">
                   <Input
                     placeholder="Card expiry date"
-                    {...register("expiryDate")}
-                    className={`border ${errors.expiryDate && 'border-red-500'}`}
                   />
-                  {errors.expiryDate && <p className="text-red-500 text-xs">{errors.expiryDate.message}</p>}
                 </div>
               </div>
               <div className="flex flex-col gap-3 w-full">
@@ -122,10 +135,7 @@ const PurchasePage = () => {
                 <div className="flex flex-col gap-1">
                   <Input
                     placeholder="Card CVV number"
-                    {...register("cvv")}
-                    className={`border ${errors.cvv && 'border-red-500'}`}
                   />
-                  {errors.cvv && <p className="text-red-500 text-xs">{errors.cvv.message}</p>}
                 </div>
               </div>
             </div>
@@ -144,7 +154,7 @@ const PurchasePage = () => {
                     <label className='font-medium'>{ticketType.name}</label>
                     <p className="text-neutral-500">{selectedEvent.name}</p>
                   </div>
-                  <p className='text-red-700 font-medium'>IDR {ticketType.price}</p>
+                  <p className='text-red-700 font-medium'>IDR {(ticketType.price).toLocaleString('de-DE')}</p>
                 </div>
                 <div className='flex gap-4 items-center'>
                   <Button
@@ -199,7 +209,7 @@ const PurchasePage = () => {
           {/* Select voucher */}
           <div className="flex flex-col gap-1">
             <label className="font-medium text-xs">Use your voucher</label>
-            <Select>
+            <Select onValueChange={(value) => setSelectedPromotion(Number(value))}>
               <SelectTrigger className="w-full text-sm h-fit">
                 <SelectValue placeholder="Choose voucher" />
               </SelectTrigger>
@@ -208,21 +218,27 @@ const PurchasePage = () => {
                   <SelectLabel>
                     Your unused voucher
                   </SelectLabel>
-                  <SelectItem value="Music">
-                    <div>
-                      <label>{promotions?.name}</label>
-                      {promotions?.type === "NOMINAL"
-                      ? <p>Get Rp. {promotions?.value} cashback from your purchase</p>
-                      : <p>Get {promotions?.value}% from product price</p>
-                      }
-                      <p>Get {promotions?.value} from product price</p>
-                    </div>
-                  </SelectItem>
+                  {Array.isArray(promotions) && promotions.map(promo => (
+                    <SelectItem key={promo.id} value={String(promo.id)}>
+                      <div>
+                        <label className="font-medium">{promo.name}</label>
+                        {promo.type === "NOMINAL" ? (
+                          <p className="text-xs text-neutral-600">
+                            Get Rp. {promo.value.toLocaleString()} cashback from your purchase
+                          </p>
+                        ) : (
+                          <p className="text-xs text-neutral-600">
+                            Get {promo.value}% off product price
+                          </p>
+                        )}
+                      </div>
+                    </SelectItem>
+                  ))}
                 </SelectGroup>
               </SelectContent>
             </Select>
           </div>
-          
+
           {/* Point checkbox */}
           <div className="flex flex-col gap-1">
             <label className="font-medium text-xs">Pay with your points</label>
@@ -243,12 +259,13 @@ const PurchasePage = () => {
               </div>
               <Input
                 type="checkbox"
+                onChange={() => setUsePoint(prev => !prev)}
                 className="w-5 h-5 border-neutral-300"
               />
             </div>
           </div>
 
-          <Button size={"action"}>Continue to payment</Button>
+          <Button onClick={handleContinuePayment} size={"action"}>Continue to payment</Button>
 
         </div>
       </div>

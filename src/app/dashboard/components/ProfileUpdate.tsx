@@ -1,6 +1,6 @@
 "use client";
 import { useUserContext } from "@/app/context/userContext";
-import { getProfile, udpateProfile } from "@/app/services/userService";
+import { getProfile, updateProfile  } from "@/app/services/userService";
 import { Button } from "@/components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSession } from "next-auth/react";
@@ -56,7 +56,7 @@ export default function ProfileUpdate() {
     setError(null);
     setIsLoading(true);
     try {
-      await udpateProfile(session, userRequest);
+      await updateProfile(session, userRequest);
       setUserDetail(userRequest);
       setIsLoading(false);
       toast.success("Update profile successful!");

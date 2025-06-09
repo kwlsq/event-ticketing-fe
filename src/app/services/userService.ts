@@ -39,7 +39,7 @@ export async function getProfile(session: TokenPair | null) {
     return response.data;
 }
 
-export async function udpateProfile(session: TokenPair | null, request: UserData) {
+export async function updateProfile (session: TokenPair | null, request: UserData) {
     const auth = `Bearer ${session?.accessToken}`
 
     const response = await axios.put(`${process.env.NEXT_PUBLIC_BACKEND_URL}${API_URL.user.detail}`, request, {

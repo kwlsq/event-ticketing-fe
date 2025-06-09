@@ -7,12 +7,24 @@ import { useEffect } from 'react';
 import PlusIcon from '../../../../public/icon/Plus Icon.svg';
 import MinusIcon from '../../../../public/icon/Minus Icon.svg';
 import { Button } from '@/components/ui/button';
+import { useSession } from 'next-auth/react';
 
 const EventDetailPage = () => {
 
+  const { data: session } = useSession();
   const eventID = usePathname();
   const router = useRouter();
   const { selectedEvent, setSelectedEventID, ticketQty, setTicketQty } = useEvents();
+
+  const rawSellDate = selectedEvent?.eventTicketTypes[0].date;
+
+  const todayDate = new Date();
+  todayDate.setHours(0, 0, 0, 0);
+
+  const isSellDateValid = rawSellDate && new Date(rawSellDate) < todayDate;
+
+  // boolean to disable purchase button if selling date is not >= today
+  const disablePurchaseButton = !isSellDateValid;
 
   useEffect(() => {
     setSelectedEventID(parseInt(eventID.split("/")[2]));
@@ -33,13 +45,16 @@ const EventDetailPage = () => {
   };
 
   const handlePurchase = () => {
+    if (!session) {
+
+    }
     const purchasePayload = {
       invoiceItemRequests: Object.entries(ticketQty)
-      .filter(([, qty]) => qty > 0)
-      .map(([id, qty]) => ({
-        eventTicketTypeID: Number(id),
-        qty
-      })),
+        .filter(([, qty]) => qty > 0)
+        .map(([id, qty]) => ({
+          eventTicketTypeID: Number(id),
+          qty
+        })),
     };
     console.log(purchasePayload);
     router.push('/purchase');
@@ -141,7 +156,19 @@ const EventDetailPage = () => {
               </div>
             ))}
           </div>
-          <Button type="submit" size={"action"} onClick={handlePurchase}>Purchase tickets</Button>
+          {session
+            ? <Button
+              type="submit"
+              size={"action"}
+              onClick={handlePurchase}
+              disabled={session ? disablePurchaseButton : true}
+            >{session ? "Purchase tickets" : "Login/Register"}</Button>
+            : <Button
+              type="submit"
+              size={"action"}
+              onClick={handlePurchase}
+            >Login / Register</Button>
+          }
         </div>
       </div>
     </div>
