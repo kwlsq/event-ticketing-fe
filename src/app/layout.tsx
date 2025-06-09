@@ -9,6 +9,7 @@ import SessionWrapper from "@/components/features/SessionWrapper";
 import NavbarWrapper from "@/components/features/NavbarWrapper";
 import { Suspense } from "react";
 import { DashboardProvider } from "./context/dashboardContext";
+import { InvoiceProvider } from './context/use-invoice';
 
 const plusJakarta = Plus_Jakarta_Sans({
   variable: "--font-jakarta",
@@ -32,13 +33,15 @@ export default function RootLayout({
           <UserProvider>
             <PointsProvider>
               <DashboardProvider>
-                <Suspense fallback={<div>Loading Navbar...</div>}>
-                  <NavbarWrapper />
-                </Suspense>
-                <Suspense>
-                  <EventProvider>{children}</EventProvider>
-                </Suspense>
-                <Toaster />
+                <InvoiceProvider>
+                  <Suspense fallback={<div>Loading Navbar...</div>}>
+                    <NavbarWrapper />
+                  </Suspense>
+                  <Suspense>
+                    <EventProvider>{children}</EventProvider>
+                  </Suspense>
+                  <Toaster />
+                </InvoiceProvider>
               </DashboardProvider>
             </PointsProvider>
           </UserProvider>

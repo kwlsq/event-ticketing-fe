@@ -6,7 +6,7 @@ import { ReactNode } from "react";
 import { EventProps, EventRequest, EventDetailsProps } from "@/types/event/event";
 import { API_URL } from "@/constants/url";
 import { useSearchParams } from "next/navigation";
-import { PromotionProps } from "@/types/promotion/promotion";
+import { PromotionProps, PromotionRequest } from "@/types/promotion/promotion";
 
 interface LocationProps {
   code: string;
@@ -43,6 +43,7 @@ interface EventContextType {
 
   createEvent: (newEvent: EventRequest, accessToken: string) => Promise<EventDetailsProps | undefined>
   uploadImage: (file: File[], accessToken: string, eventID: number) => Promise<boolean>
+  createPromotion: (promotionRequest: PromotionRequest, accessToken: string) => Promise<boolean>
 }
 
 const EventContext = createContext<EventContextType | undefined>(undefined);
@@ -168,7 +169,7 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
         formData.append("multipartFiles", file);
       });
 
-      const res = await axios.post(
+      const response = await axios.post(
         `${API_URL.BASE_URL_LOCAL}${API_URL.endpoints.image}/${eventID}`,
         formData,
         {
@@ -179,9 +180,29 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
         }
       );
 
-      return res.status === 200;
-    } catch (err) {
-      console.error("Image upload failed:", err);
+      return response.status === 200;
+    } catch (error) {
+      console.error("Image upload failed:", error);
+      return false;
+    }
+  }
+
+  // Create promotion if organizer add promotion in the event
+  const createPromotion = async (promotion: PromotionRequest, accessToken: string): Promise<boolean> => {
+    try {
+      const response = await axios.post(
+        `${API_URL.BASE_URL_LOCAL}${API_URL.endpoints.promotion}/create`,
+        promotion,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`
+          }
+        }
+      );
+
+      return response.status === 200;
+    } catch (error) {
+      console.error("Failed to create promotion:", error);
       return false;
     }
   }
@@ -214,7 +235,8 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
       setTicketQty,
       promotions,
       setPromotions,
-      uploadImage
+      uploadImage,
+      createPromotion
     }}>
       {children}
     </EventContext.Provider>

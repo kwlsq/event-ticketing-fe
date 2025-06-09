@@ -161,8 +161,8 @@ const EventDetailPage = () => {
               type="submit"
               size={"action"}
               onClick={handlePurchase}
-              disabled={disablePurchaseButton}
-            >Purchase tickets</Button>
+              disabled={session ? disablePurchaseButton : true}
+            >{session ? "Purchase tickets" : "Login/Register"}</Button>
             : <Button
               type="submit"
               size={"action"}

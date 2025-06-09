@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { auth } from "@/auth";
 
-const PUBLIC_PATHS = ["/", "/event-details"];
+const PUBLIC_PATHS = ["/", "/event-details", "/invoice"];
 const ROLE_PATHS = {
   organizer: ["/dashboard/organizer", "/dashboard/organizer/*"],
   user: ["/dashboard/user", "/dashboard/user/*"],

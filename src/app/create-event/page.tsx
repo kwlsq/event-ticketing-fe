@@ -52,7 +52,8 @@ const eventFormSchema = z.object({
     type: z.enum([PromotionType.Percentage, PromotionType.Nominal]),
     value: z.number(),
     maxUsage: z.number(),
-    isReferralPromotion: z.boolean()
+    isReferralPromotion: z.boolean(),
+    period: z.number()
   }).nullable().optional()
 });
 
@@ -60,7 +61,7 @@ export type EventForm = z.infer<typeof eventFormSchema>;
 
 export default function CreateEvent() {
   const { data: session } = useSession();
-  const { regencies, createEvent, uploadImage } = useEvents();
+  const { regencies, createEvent, uploadImage, createPromotion } = useEvents();
   const [files, setFiles] = useState<FileList | null>(null);
   const [mediaPreviews, setMediaPreviews] = useState<string[]>();
 
@@ -75,7 +76,8 @@ export default function CreateEvent() {
         type: PromotionType.Percentage,
         value: 0,
         maxUsage: 0,
-        isReferralPromotion: true
+        isReferralPromotion: false,
+        period: 1
       },
       location: ""
     }
@@ -118,28 +120,55 @@ export default function CreateEvent() {
 
   const onSubmit = async (data: EventForm) => {
     try {
+
+      let createdEvent = null;
+      let imageUploadResponse = false;
+      let createPromotionResponse = false;
+
       if (!session || !session.accessToken) {
         console.error("Authentication error!");
         return;
       }
 
       // create event first
-      const createdEvent = await createEvent(data, session?.accessToken);
+      createdEvent = await createEvent(data, session?.accessToken);
 
       if (createdEvent === undefined) {
         return null;
       }
 
+      // upload image
       if (files && files.length > 0) {
-
-        // upload image
         const filesArray = Array.from(files);
-        const imageUploadResponse = await uploadImage(filesArray, session.accessToken, createdEvent.id);
+        imageUploadResponse = await uploadImage(filesArray, session.accessToken, createdEvent.id);
 
         if (imageUploadResponse) {
-          toast.success("Successfully create event!");
+          console.log("Image upload successful");
         }
       }
+
+      // create promotion
+      if (data.eventPromotion) {
+        // match form promotion data with Promotion Request DTO
+        const promotionRequest = {
+          ...data.eventPromotion,
+          eventID: createdEvent.id
+        }
+
+        console.log(promotionRequest);
+        
+
+        createPromotionResponse = await createPromotion(promotionRequest, session.accessToken);
+
+        if (createPromotionResponse) {
+          console.log("Create promotion successful");
+        }
+      }
+
+      if (createEvent !== undefined && imageUploadResponse && createPromotionResponse) {
+        toast.success("Successfully create event!")
+      }
+
     } catch (err) {
       console.error("Upload failed:", err);
     }
@@ -452,6 +481,7 @@ export default function CreateEvent() {
                     {errors.eventPromotion?.description && <p className="text-red-500 text-xs">{errors.eventPromotion?.description.message}</p>}
                   </div>
                 </div>
+
                 <div className="flex gap-2">
                   {/* Input promotion value */}
                   <div className="flex flex-col gap-3 w-3/5">
@@ -472,7 +502,7 @@ export default function CreateEvent() {
                   {/* Choose promotion unit (percentage or nominal) */}
                   <div className="flex flex-col gap-3 w-2/5">
                     <label className="text-sm font-medium">
-                      Event type <span className="text-red-500">*</span>
+                      Promotion unit <span className="text-red-500">*</span>
                     </label>
                     <Controller
                       control={control}
@@ -512,31 +542,18 @@ export default function CreateEvent() {
                       {errors.eventPromotion?.maxUsage && <p className="text-red-500 text-xs">{errors.eventPromotion?.maxUsage.message}</p>}
                     </div>
                   </div>
-                  <div className="w-2/5">
-                    <div className="flex flex-col gap-3 w-full">
-                      <label className="text-sm font-medium">
-                        Referral promotion <span className="text-red-500">*</span>
-                      </label>
-                      <Controller
-                        control={control}
-                        name="eventPromotion.isReferralPromotion"
-                        render={({ field }) => (
-                          <Select
-                            value={field.value?.toString() ?? ""}
-                            onValueChange={(val) => field.onChange(val === "true")}
-                          >
-                            <SelectTrigger className="w-full">
-                              <SelectValue placeholder="Yes" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectGroup>
-                                <SelectItem value="true">Yes</SelectItem>
-                                <SelectItem value="false">No</SelectItem>
-                              </SelectGroup>
-                            </SelectContent>
-                          </Select>
-                        )}
+                  <div className="flex flex-col gap-3">
+                    <label className="text-sm font-medium">
+                      Period (month)
+                    </label>
+                    <div className="flex flex-col gap-1">
+                      <Input
+                        type="number"
+                        placeholder="Promotion period"
+                        {...register("eventPromotion.period", { valueAsNumber: true })}
+                        className={`border ${errors.eventPromotion?.period && 'border-red-500'}`}
                       />
+                      {errors.eventPromotion?.period && <p className="text-red-500 text-xs">{errors.eventPromotion?.period.message}</p>}
                     </div>
                   </div>
                 </div>
