@@ -42,7 +42,7 @@ const RegisterDialogContent = () => {
         name: data.name,
         email: data.email,
         password: data.password,
-        code: data.referralCode,
+        code: data.referralCode?.toUpperCase(),
       });
       setIsLoading(false);
       toast.success("Registration successful!");
