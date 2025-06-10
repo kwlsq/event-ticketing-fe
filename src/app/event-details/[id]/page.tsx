@@ -10,6 +10,8 @@ import { Button } from '@/components/ui/button';
 import { useSession } from 'next-auth/react';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { Card, CardContent } from '@/components/ui/card';
+import MapIcon from "../../../../public/icon/Map Pin Icon.svg"
+import StarIcon from "../../../../public/icon/Tabler Star Icon.svg"
 
 const EventDetailPage = () => {
 
@@ -70,10 +72,12 @@ const EventDetailPage = () => {
   // Format time to 24 hours
   const formattedTime = new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false }).format(dateTimestamp);
 
+  // formatted review data
+
 
   return (
-    <div className='px-80'>
-      <Carousel opts={{loop: true}}>
+    <div className='px-40 flex flex-col gap-14 pt-9'>
+      <Carousel opts={{ loop: true }}>
         <CarouselContent>
           {selectedEvent?.images.map((image) => (
             <CarouselItem key={image.id}>
@@ -92,18 +96,19 @@ const EventDetailPage = () => {
             </CarouselItem>
           ))}
         </CarouselContent>
-        <CarouselPrevious/>
-        <CarouselNext/>
+        <CarouselPrevious />
+        <CarouselNext />
       </Carousel>
 
-      <div className='flex'>
-        <div className='w-full'>
+      <div className='flex gap-10'>
+        <div className='w-full flex flex-col gap-14'>
           {/* Event name & description */}
           <div className='flex flex-col gap-6 w-full'>
             <h1 className='font-semibold text-3xl'>{selectedEvent?.name}</h1>
             <p className='line-clamp-3'>{selectedEvent?.description}</p>
           </div>
-          <div>
+          {/* Event date and location */}
+          <div className='flex flex-col gap-8'>
             <div className='flex items-center gap-6'>
               <div className='rounded-xl overflow-hidden border-2 border-solid border-neutral-200 items-center w-20 h-20'>
                 <p className='px-6 py-1 bg-blue-50 font-medium border-b-2 border-solid border-neutral-200 w-full text-center'>{dayEvent.substring(0, 3)}</p>
@@ -116,9 +121,13 @@ const EventDetailPage = () => {
             </div>
             <div>
               <div className='flex items-center gap-6'>
-                <div className='rounded-xl overflow-hidden border-2 border-solid border-neutral-200 items-center w-20 h-20'>
-                  <p className='px-6 py-1 bg-blue-50 font-medium border-b-2 border-solid border-neutral-200 w-full text-center'>{dayEvent.substring(0, 3)}</p>
-                  <p className='py-3 font-medium w-full text-center'>{formattedDate.split(" ")[0]} {formattedDate.split(" ")[1].substring(0, 3)}</p>
+                <div className='flex rounded-xl overflow-hidden border-2 border-solid border-neutral-200 items-center justify-center w-20 h-20'>
+                  <Image
+                    src={MapIcon}
+                    alt='Map Icon'
+                    width={32}
+                    height={32}
+                  />
                 </div>
                 <div className='flex flex-col gap-2'>
                   <p className='font-semibold'>{selectedEvent.venue}</p>
@@ -127,9 +136,43 @@ const EventDetailPage = () => {
               </div>
             </div>
           </div>
+          {/* Event review */}
+          <div>
+            <h2 className='text-2xl font-semibold'>Review</h2>
+            <div>
+              {selectedEvent.reviews.map((review) => {
+                const date = new Date(review.createdAt)
+                const formattedDate = new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: 'long', year: 'numeric' }).format(date);
+                return (
+                  <div key={review.review} className='flex flex-col gap-3 w-full py-6 border-b-[1px] border-solid border-neutral-300'>
+                    <div className='flex gap-2 items-center'>
+                      <div className='rounded-full bg-neutral-500 w-9 h-9' />
+                      <div>
+                        <p className='font-semibold'>{review.userName}</p>
+                        <div className='flex gap-1 items-center'>
+                          {[...Array(review.rating)].map((_, i) => (
+                            <Image
+                              key={i}
+                              src={StarIcon}
+                              alt='Star Icon'
+                              width={16}
+                              height={16}
+                            />
+                          ))}
+                          <p className='text-sm font-medium'>{formattedDate}</p>
+                        </div>
+                      </div>
+                    </div>
+                    <p className='text-sm text-neutral-400'>{review.review}</p>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
         </div>
         {/* Purchase ticket type */}
-        <div className='w-full flex flex-col gap-6'>
+        <div className='w-full flex flex-col gap-9'>
+          <h2 className='text-2xl font-semibold'>Ticket available</h2>
           <div className='flex flex-col gap-5'>
             {selectedEvent?.eventTicketTypes.map((ticketType) => (
               <div key={ticketType.id} className='p-4 rounded-xl border-neutral-300 border-solid border-[1px] flex justify-between'>
