@@ -6,9 +6,10 @@ import { ListMenuItem } from "@/types/dashboard/Dashboard";
 import Link from "next/link";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
+import { useUserContext } from "@/app/context/userContext";
 
 interface Props {
-  userDetail: {
+  userDetailSession: {
     nameInitial: string;
     name: string;
     email: string;
@@ -16,8 +17,9 @@ interface Props {
   };
 }
 
-const Sidebar: React.FC<Props> = ({ userDetail }) => {
+const Sidebar: React.FC<Props> = ({ userDetailSession }) => {
   const { totalPoints } = usePointsContext();
+  const { userDetail } = useUserContext();
   const pathname = usePathname();
 
   const [selectedMenu, setSelectedMenu] = useState<string>(
@@ -25,22 +27,24 @@ const Sidebar: React.FC<Props> = ({ userDetail }) => {
   );
 
   const sidebarMenus: Array<ListMenuItem> =
-    userDetail.role === "user" ? sidebarUser : sidebarOrganizer;
+    userDetailSession.role === "user" ? sidebarUser : sidebarOrganizer;
 
   return (
     <div className="md:w-1/3 m-4">
       <div
-        className={`flex gap-3 ${userDetail.role === "user" ? `mb-3` : `mb-8`}`}
+        className={`flex gap-3 ${
+          userDetailSession.role === "user" ? `mb-3` : `mb-8`
+        }`}
       >
         <div className="flex items-center justify-center bg-primary p-2 rounded-full w-12 h-12  text-white cursor-pointer">
-          {userDetail.nameInitial}
+          {userDetail?.name?.charAt(0)}
         </div>
         <div>
-          <div className="font-bold">{userDetail.name}</div>
-          <div>{userDetail.email}</div>
+          <div className="font-bold">{userDetail?.name}</div>
+          <div>{userDetail?.email}</div>
         </div>
       </div>
-      {userDetail.role === "user" ? (
+      {userDetailSession.role === "user" ? (
         <div className="flex gap-2 mb-8 items-center justify-between mt-2 px-5 py-3 rounded-md bg-linear-to-r from-blue-500 to-blue-800 text-white">
           <div className="flex gap-2">
             <Image
@@ -61,7 +65,7 @@ const Sidebar: React.FC<Props> = ({ userDetail }) => {
         {sidebarMenus.map((item, index) => {
           return (
             <Link
-              href={`/dashboard/${userDetail.role}/${item.url}`}
+              href={`/dashboard/${userDetailSession.role}/${item.url}`}
               key={index}
               className={`flex gap-3 cursor-pointer font-medium px-5 py-3 rounded-md ${
                 selectedMenu === item.url
