@@ -1,6 +1,7 @@
 "use client";
 
 import { usePointsContext } from "@/app/context/pointsContext";
+import { useUserContext } from "@/app/context/userContext";
 import { logout } from "@/app/services/userService";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent } from "@/components/ui/popover";
@@ -13,7 +14,7 @@ import Link from "next/link";
 interface Props {
   open: boolean;
   setOpenPopOver: (val: boolean) => void;
-  userDetail: {
+  userDetailSession: {
     nameInitial: string;
     name: string;
     email: string;
@@ -38,10 +39,11 @@ const handleLogout = async (
 const ProfilePopOver: React.FC<Props> = ({
   open,
   setOpenPopOver,
-  userDetail,
+  userDetailSession,
   session,
 }) => {
   const { totalPoints } = usePointsContext();
+  const {userDetail} = useUserContext();
   return (
     <Popover open={open} onOpenChange={setOpenPopOver}>
       <PopoverTrigger>
@@ -49,22 +51,22 @@ const ProfilePopOver: React.FC<Props> = ({
           className="bg-primary p-2 rounded-full w-10 h-10 text-center text-white cursor-pointer"
           onClick={() => setOpenPopOver(true)}
         >
-          {userDetail.nameInitial}
+          {userDetail?.name?.charAt(0)}
         </div>
       </PopoverTrigger>
       <PopoverContent align="end">
         <div className="px-5 py-3 rounded-2xl bg-linear-to-r from-blue-500 to-blue-800 text-white">
           <div
             className={`flex justify-between items-center ${
-              userDetail.role === "user" ? `border-b-1` : ``
+              userDetailSession.role === "user" ? `border-b-1` : ``
             } border-[#5499E3] pb-2`}
           >
             <div>
-              <div className="font-bold text-sm">{userDetail.name}</div>
-              <div className="text-xs">{userDetail.email}</div>
+              <div className="font-bold text-sm">{userDetail?.name}</div>
+              <div className="text-xs">{userDetail?.email}</div>
             </div>
             <Link
-              href={`/dashboard/${userDetail.role}/profile`}
+              href={`/dashboard/${userDetailSession.role}/profile`}
               className="cursor-pointer"
             >
               <Image
@@ -76,7 +78,7 @@ const ProfilePopOver: React.FC<Props> = ({
             </Link>
           </div>
 
-          {userDetail.role === "user" ? (
+          {userDetailSession.role === "user" ? (
             <div className="flex gap-2 items-center mt-2">
               <div>
                 <Image

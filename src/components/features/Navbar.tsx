@@ -85,7 +85,7 @@ const Navbar = ({ searchParams }: { searchParams: URLSearchParams }) => {
             <ProfilePopOver
               open={isOpenPopOver}
               setOpenPopOver={updateIsOpenPopOver}
-              userDetail={userDetail}
+              userDetailSession={userDetail}
               session={session}
             ></ProfilePopOver>
           ) : (
