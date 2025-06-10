@@ -3,9 +3,8 @@
 import AuthDialog from "@/app/components/AuthDialog";
 import ProfilePopOver from "@/app/components/ProfilePopOver";
 import { useUserContext } from "@/app/context/userContext";
+import { getProfile } from "@/app/services/userService";
 import { Button } from "@/components/ui/button";
-import { TokenClaims } from "@/types/auth/TokenPair";
-import { jwtDecode } from "jwt-decode";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
@@ -24,7 +23,8 @@ const Navbar = ({ searchParams }: { searchParams: URLSearchParams }) => {
   } = useUserContext();
 
   const { data: session } = useSession();
-  const [userDetail, setUserDetail] = useState({
+  const { userDetail,setUserDetail } = useUserContext();
+  const [userDetails, setUserDetails] = useState({
     name: "",
     email: "",
     nameInitial: "",
@@ -33,14 +33,29 @@ const Navbar = ({ searchParams }: { searchParams: URLSearchParams }) => {
 
   const loginParam = searchParams.get("login");
   const pathname = usePathname();
+
+  const updateUserDetail = useCallback(async () => {
+    try {
+      const userDetailResponse = await getProfile(session);
+      setUserDetail(userDetailResponse.data);
+    } catch (error) {
+      console.error(error);
+    }
+  }, [session?.accessToken, setUserDetail]);
+
+  useEffect(() => {
+    if (session) {
+      updateUserDetail();
+    }
+  }, [session?.accessToken, updateUserDetail]);
+
   useEffect(() => {
     if (session?.accessToken) {
-      const accessTokenDecoded = jwtDecode<TokenClaims>(session.accessToken);
-      const name = accessTokenDecoded.name;
-      const email = accessTokenDecoded.email;
+      const name = userDetail?.name || "";
+      const email = userDetail?.email || "";
       const nameInitial = name?.charAt(0) ?? "";
       const role = session.user.roles[0].split("_")[1];
-      setUserDetail({ name, email, nameInitial, role });
+      setUserDetails({ name, email, nameInitial, role });
     }
   }, [session?.accessToken]);
 
@@ -85,7 +100,7 @@ const Navbar = ({ searchParams }: { searchParams: URLSearchParams }) => {
             <ProfilePopOver
               open={isOpenPopOver}
               setOpenPopOver={updateIsOpenPopOver}
-              userDetailSession={userDetail}
+              userDetailSession={userDetails}
               session={session}
             ></ProfilePopOver>
           ) : (
