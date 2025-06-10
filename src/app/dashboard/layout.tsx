@@ -33,7 +33,7 @@ export default function DashboardLayout({
 
   return (
     <div className="flex gap-5 md:mx-[100px] my-4">
-      <Sidebar userDetail={userDetail} />
+      <Sidebar userDetailSession={userDetail} />
       <main className="p-4 w-full h-auto">{children}</main>
     </div>
   );
