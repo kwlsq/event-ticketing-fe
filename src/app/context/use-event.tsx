@@ -110,7 +110,7 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
             sort: sort,
             search: query,
             location: location,
-            category: category.id === 0 ? "" : category.id,
+            category: category.id === 0 ? 0 : category.id,
           },
         });
         const events: EventProps[] = response.data.data.content;

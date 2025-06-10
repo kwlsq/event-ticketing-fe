@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input";
 import { ChangeEvent, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import EmptyStateImage from "../../public/EmptyState.svg"
 
 const sortLabels: Record<string, string> = {
   name: "Sort by Name",
@@ -133,17 +134,17 @@ export default function Home() {
 
         {/* Category tab */}
         <Tabs
-        value={String(category?.id)}
-        onValueChange={(value) => {
-          const selectedCategory = categories?.find((category) => String(category.id) === value);
-          if(selectedCategory) setCategory(selectedCategory);
-        }
-        }>
+          value={category?.id.toString()}
+          onValueChange={(value) => {
+            const selectedCategory = categories?.find((category) => category.id === Number(value));
+            if (selectedCategory) setCategory(selectedCategory);
+          }
+          }>
           <TabsList className="w-full p-0 bg-background justify-start border-b rounded-none shadow-none">
             {categories?.map((category) => (
               <TabsTrigger
                 key={category.id}
-                value={String(category.id)}
+                value={category.id.toString()}
                 className="rounded-none bg-background h-full shadow-none border-b-0 
              text-neutral-400 font-semibold 
              data-[state=active]:border-0 data-[state=active]:border-b-2 data-[state=active]:border-primary 
@@ -207,22 +208,32 @@ export default function Home() {
           </div>
         </div>
         {/* Event list */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-          {events?.map((event) => (
-            <div key={event.id}>
-              <EventCard
-                name={event.name}
-                date={event.date}
-                venue={event.venue}
-                location={event.location}
-                startingPrice={event.startingPrice}
-                id={event.id}
-                isEventFree={event.isEventFree}
-                thumbnailUrl={event.thumbnailUrl}
-              />
-            </div>
-          ))}
-        </div>
+        {totalElements === 0
+          ? <div className="w-full h-full flex flex-col items-center justify-center text-center gap-4">
+            <Image
+              src={EmptyStateImage}
+              alt="Empty state image"
+            />
+            <p className="text-sm text-neutral-500">No matched event</p>
+          </div>
+          : <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+            {events?.map((event) => (
+              <div key={event.id}>
+                <EventCard
+                  name={event.name}
+                  date={event.date}
+                  venue={event.venue}
+                  location={event.location}
+                  startingPrice={event.startingPrice}
+                  id={event.id}
+                  isEventFree={event.isEventFree}
+                  thumbnailUrl={event.thumbnailUrl}
+                />
+              </div>
+            ))}
+          </div>
+        }
+
         {/* Event pagination */}
         <DynamicPagination totalPages={totalPages} setPages={setPage} />
       </div>
