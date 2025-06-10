@@ -16,8 +16,13 @@ import {
   useState,
 } from "react";
 import { getInvoicesByID } from "../services/dashboardService";
+import { InvoiceResponseProps } from "@/types/invoice/invoice";
 
 interface InvoiceContextType {
+  invoice: InvoiceResponseProps | null
+
+  setInvoice: (invoice: InvoiceResponseProps | null) => void
+
   invoices: PaginatedInvoiceApiResponse | undefined;
 
   createInvoice: (
@@ -31,6 +36,7 @@ interface InvoiceContextType {
 const InvoiceContext = createContext<InvoiceContextType | undefined>(undefined);
 
 export const InvoiceProvider = ({ children }: { children: ReactNode }) => {
+  const [invoice, setInvoice] = useState<InvoiceResponseProps | null>(null);
   const [invoices, setInvoices] = useState<
     PaginatedInvoiceApiResponse | undefined
   >();
@@ -62,16 +68,14 @@ export const InvoiceProvider = ({ children }: { children: ReactNode }) => {
     eventID: number | undefined
   ): Promise<boolean> => {
     try {
-      const response = await axios.post(
-        `${API_URL.BASE_URL_LOCAL}${API_URL.endpoints.invoice}/create/${eventID}`,
-        invoiceRequest,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
+      console.log(invoiceRequest);
+      
+      const response = await axios.post(`${API_URL.BASE_URL_LOCAL}${API_URL.endpoints.invoice}/create/${eventID}`, invoiceRequest, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`
         }
-      );
-
+      });
+      setInvoice(response.data.data);
       return response.status === 200;
     } catch (error) {
       console.error(error);
@@ -79,13 +83,7 @@ export const InvoiceProvider = ({ children }: { children: ReactNode }) => {
     }
   };
   return (
-    <InvoiceContext.Provider
-      value={{
-        invoices,
-        createInvoice,
-        updateInvoices,
-      }}
-    >
+    <InvoiceContext.Provider value={{ invoices, createInvoice, invoice, setInvoice, updateInvoices }}>
       {children}
     </InvoiceContext.Provider>
   );

@@ -51,3 +51,8 @@ export interface EventRequest {
   ticketSaleDate: Date,
   ticketTypeRequest: EventTicketTypeRequest[] 
 }
+
+export interface Category {
+  id: number,
+  name: string
+}

@@ -14,16 +14,22 @@ import { cn } from "@/lib/utils";
 import { useInvoice } from "../context/use-invoice";
 import { useSession } from "next-auth/react";
 import { InvoiceItemsRequest, InvoiceRequest } from "@/types/invoice/invoice";
+import { useRouter } from "next/navigation";
+import PercentageIcon from "../../../public/icon/Circle Percentage Icon.svg"
+import CurrencyIcon from "../../../public/icon/Tabler Coin Icon.svg"
 
 const PurchasePage = () => {
 
   const { ticketQty, setTicketQty, selectedEvent, promotions } = useEvents();
   const [subtotal, setSubtotal] = useState(0);
+  const [discount, setDiscount] = useState(0);
+  const [total, setTotal] = useState(0);
   const [selectedPromotion, setSelectedPromotion] = useState(0);
   const [isUsePoint, setUsePoint] = useState(false);
   const { totalPoints } = usePointsContext();
   const { createInvoice } = useInvoice();
   const { data: session } = useSession();
+  const router = useRouter();
 
   const handleTicketMinus = (id: number) => {
     setTicketQty((prev) => ({
@@ -48,10 +54,29 @@ const PurchasePage = () => {
           total += ticket.price * ticketQty[ticket.id]
         }
       })
+
+      let promoDiscount = 0;
+      if (selectedPromotion && Array.isArray(promotions)) {
+        const promo = promotions.find(p => p.id === selectedPromotion);
+        if (promo) {
+          if (promo.type === "NOMINAL") {
+            promoDiscount = promo.value;
+          } else if (promo.type === "PERCENTAGE") {
+            promoDiscount = Math.floor(total * (promo.value / 100));
+          }
+        }
+      }
+
+      const pointUsed = isUsePoint ? totalPoints : 0;
+      const tax = 2000;
+      const grand = Math.max(total - promoDiscount + tax - pointUsed, 0);
+
       setSubtotal(total);
+      setDiscount(promoDiscount);
+      setTotal(grand);
     }
     calculateSubtotal();
-  }, [ticketQty, selectedEvent?.eventTicketTypes])
+  }, [ticketQty, selectedEvent?.eventTicketTypes, selectedPromotion, promotions, totalPoints, isUsePoint])
 
 
   if (!session) return;
@@ -75,11 +100,13 @@ const PurchasePage = () => {
       pointAmount: isUsePoint ? totalPoints : 0,
       promotionID: selectedPromotion
     }
-    console.log(invoiceRequest);
 
     try {
       const response = await createInvoice(invoiceRequest, session?.accessToken, selectedEvent?.id);
-      if (response) return console.log("Successfully create invoice!");
+      if (response) {
+        console.log("Successfully create invoice!");
+        router.push("/invoice");
+      }
     } catch (error) {
       console.error("Failed to proceed invoice", error);
     }
@@ -198,40 +225,53 @@ const PurchasePage = () => {
               <p className="font-medium">IDR {subtotal.toLocaleString('de-DE')}</p>
             </div>
             <div className="text-sm text-neutral-500 flex justify-between">
-              <p>Tax (2%)</p>
-              <p className="font-medium">IDR {((subtotal) * 2 / 100).toLocaleString('de-DE')}</p>
+              <p>Tax</p>
+              <p className="font-medium">IDR {(2000).toLocaleString('de-DE')}</p>
+            </div>
+            <div className={cn("text-sm text-neutral-500 flex justify-between", !selectedPromotion ? "hidden" : "")}>
+              <p>Voucher</p>
+              <p className="font-medium text-red-500">- IDR {discount.toLocaleString('de-DE')}</p>
+            </div>
+            <div className={cn("text-sm text-neutral-500 flex justify-between", !isUsePoint ? "hidden" : "")}>
+              <p>Purwapoint</p>
+              <p className="font-medium text-red-500">- IDR {totalPoints.toLocaleString('de-DE')}</p>
             </div>
           </div>
 
-          {/* Divider */}
-          <p className="w-full border-dashed border-[1px] border-neutral-200" />
 
           {/* Select voucher */}
           <div className="flex flex-col gap-1">
             <label className="font-medium text-xs">Use your voucher</label>
             <Select onValueChange={(value) => setSelectedPromotion(Number(value))}>
-              <SelectTrigger className="w-full text-sm h-fit">
+              <SelectTrigger className="w-full text-sm h-auto py-2">
                 <SelectValue placeholder="Choose voucher" />
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
-                  <SelectLabel>
-                    Your unused voucher
-                  </SelectLabel>
+                  <SelectLabel>Your unused voucher</SelectLabel>
                   {Array.isArray(promotions) && promotions.map(promo => (
                     <SelectItem key={promo.id} value={String(promo.id)}>
-                      <div>
-                        <label className="font-medium">{promo.name}</label>
-                        {promo.type === "NOMINAL" ? (
-                          <p className="text-xs text-neutral-600">
-                            Get Rp. {promo.value.toLocaleString()} cashback from your purchase
-                          </p>
-                        ) : (
-                          <p className="text-xs text-neutral-600">
-                            Get {promo.value}% off product price
-                          </p>
-                        )}
-                      </div>
+                      {promo.type === "NOMINAL" ? (
+                        <div className="flex gap-2 py-2">
+                          <Image src={CurrencyIcon} width={24} height={24} alt="Currency icon" />
+                          <div className="flex flex-col items-start">
+                            <label className="font-medium">{promo.name}</label>
+                            <p className="text-xs text-neutral-600">
+                              Get Rp. {promo.value.toLocaleString()} cashback from your purchase
+                            </p>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex gap-2 py-2">
+                          <Image src={PercentageIcon} width={24} height={24} alt="Percentage icon" />
+                          <div className="flex flex-col items-start">
+                            <label className="font-medium">{promo.name}</label>
+                            <p className="text-xs text-neutral-600">
+                              Get {promo.value}% off product price
+                            </p>
+                          </div>
+                        </div>
+                      )}
                     </SelectItem>
                   ))}
                 </SelectGroup>
@@ -263,6 +303,15 @@ const PurchasePage = () => {
                 className="w-5 h-5 border-neutral-300"
               />
             </div>
+          </div>
+
+          {/* Divider */}
+          <p className="w-full border-dashed border-[1px] border-neutral-200" />
+
+          {/* Total price */}
+          <div className="text-sm text-neutral-500 flex justify-between">
+            <p>Total</p>
+            <p className="font-medium">IDR {(total).toLocaleString('de-DE')}</p>
           </div>
 
           <Button onClick={handleContinuePayment} size={"action"}>Continue to payment</Button>

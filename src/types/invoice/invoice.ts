@@ -1,4 +1,5 @@
 import { EventDetailsProps, EventProps } from "../event/event";
+import { TicketTypeResponse } from "../ticketTypes/ticketTypes";
 
 enum PaymentStatus {
   PENDING = "PENDING",
@@ -32,6 +33,7 @@ export interface InvoiceResponseProps {
   msisdn: string,
   status: PaymentStatus,
   paymentDate: string,
+  paymentMethod: string,
   amount: number,
   fees: number,
   finalAmount: number,
@@ -41,9 +43,9 @@ export interface InvoiceResponseProps {
 }
 
 export interface InvoiceItemsResponse {
-  eventTicketTypeID: number,
+  subtotal: number,
   qty: number,
-
+  ticketTypeResponse: TicketTypeResponse
 }
 
 export interface InvoiceItemsRequest {

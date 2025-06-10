@@ -3,7 +3,7 @@
 import axios from "axios";
 import { createContext, useContext, useEffect, useState } from "react";
 import { ReactNode } from "react";
-import { EventProps, EventRequest, EventDetailsProps } from "@/types/event/event";
+import { EventProps, EventRequest, EventDetailsProps, Category } from "@/types/event/event";
 import { API_URL } from "@/constants/url";
 import { useSearchParams } from "next/navigation";
 import { PromotionProps, PromotionRequest } from "@/types/promotion/promotion";
@@ -27,7 +27,9 @@ interface EventContextType {
   regencies: LocationProps[],
   location: string,
   ticketQty: Record<number, number>,
-  promotions: PromotionProps | null
+  promotions: PromotionProps | null,
+  categories: Category[] | null,
+  category: Category | null,
 
   setSelectedEventID: (selectedEventID: number) => void,
   setSelectedEvent: (selectedEvent: EventDetailsProps | null) => void,
@@ -39,7 +41,9 @@ interface EventContextType {
   setRegencies: (regencies: LocationProps[]) => void,
   setLocation: (location: string) => void,
   setTicketQty: React.Dispatch<React.SetStateAction<Record<number, number>>>,
-  setPromotions: (promotion: PromotionProps) => void
+  setPromotions: (promotion: PromotionProps) => void,
+  setCategories: (categories: Category[] | null) => void,
+  setCategory: (category: Category) => void
 
   createEvent: (newEvent: EventRequest, accessToken: string) => Promise<EventDetailsProps | undefined>
   uploadImage: (file: File[], accessToken: string, eventID: number) => Promise<boolean>
@@ -66,6 +70,8 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
   const [location, setLocation] = useState("");
   const [ticketQty, setTicketQty] = useState<Record<number, number>>({});
   const [promotions, setPromotions] = useState<PromotionProps | null>(null);
+  const [categories, setCategories] = useState<Category[] | null>(null);
+  const [category, setCategory] = useState<Category>({ id: 0, name: "All" });
 
   useEffect(() => {
     const pageParam = Number(searchParams.get("page") || "0");
@@ -79,6 +85,20 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
     setLocation(locationParam);
   }, [searchParams]);
 
+  // Fetch event category
+  useEffect(() => {
+    const fetchCategoryData = async () => {
+      try {
+        const response = await axios.get(`${API_URL.BASE_URL_LOCAL}${API_URL.endpoints.category}`);
+        setCategories([{ id: 0, name: "All" }, ...response.data]);
+      } catch (error) {
+        setError(error);
+        setLoading(false);
+      }
+    }
+    fetchCategoryData();
+  }, []);
+
   // Fetch event data
   useEffect(() => {
     const fetchEventData = async () => {
@@ -89,7 +109,8 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
             size: 12,
             sort: sort,
             search: query,
-            location: location
+            location: location,
+            category: category.id === 0 ? 0 : category.id,
           },
         });
         const events: EventProps[] = response.data.data.content;
@@ -103,7 +124,7 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
       }
     }
     fetchEventData();
-  }, [page, sort, totalPages, query, location, totalElements]);
+  }, [page, sort, query, location, category]);
 
   // Fetch regencies for Jakarta and West Java
   useEffect(() => {
@@ -236,7 +257,11 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
       promotions,
       setPromotions,
       uploadImage,
-      createPromotion
+      createPromotion,
+      categories,
+      setCategories,
+      category,
+      setCategory
     }}>
       {children}
     </EventContext.Provider>

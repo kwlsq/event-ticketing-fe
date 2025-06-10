@@ -46,6 +46,7 @@ const EventCard: FC<EventProps> = ({ name, date, venue, location, startingPrice,
           src={thumbnailUrl || "https://placehold.co/295x200.png"}
           alt="event image"
           fill
+          sizes="(max-width: 295px) 100vw, 295px"
           className="object-cover"
           quality={100}
           priority

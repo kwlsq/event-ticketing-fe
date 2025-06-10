@@ -9,7 +9,8 @@ export const API_URL = {
     image: '/api/v1/image',
     event: '/api/v1/event',
     promotion: '/api/v1/promotion',
-    invoice: '/api/v1/invoice'
+    invoice: '/api/v1/invoice',
+    category: '/api/v1/category'
   },
   auth: {
     login: "/api/v1/auth/login",

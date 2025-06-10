@@ -8,6 +8,8 @@ import PlusIcon from '../../../../public/icon/Plus Icon.svg';
 import MinusIcon from '../../../../public/icon/Minus Icon.svg';
 import { Button } from '@/components/ui/button';
 import { useSession } from 'next-auth/react';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+import { Card, CardContent } from '@/components/ui/card';
 
 const EventDetailPage = () => {
 
@@ -45,9 +47,6 @@ const EventDetailPage = () => {
   };
 
   const handlePurchase = () => {
-    if (!session) {
-
-    }
     const purchasePayload = {
       invoiceItemRequests: Object.entries(ticketQty)
         .filter(([, qty]) => qty > 0)
@@ -74,16 +73,29 @@ const EventDetailPage = () => {
 
   return (
     <div className='px-80'>
-      {selectedEvent?.images.map((image) => (
-        <div key={image.id} className='w-full h-[364px] object-cover flex relative'>
-          <Image
-            src={image.url || "https://placehold.co/1000x1000.png"}
-            alt={image.alt}
-            layout="fill"
-            objectFit='cover'
-          />
-        </div>
-      ))}
+      <Carousel opts={{loop: true}}>
+        <CarouselContent>
+          {selectedEvent?.images.map((image) => (
+            <CarouselItem key={image.id}>
+              <div>
+                <Card>
+                  <CardContent className='flex w-[800px] h-[364px] items-center justify-center'>
+                    <Image
+                      src={image.url || "https://placehold.co/1000x1000.png"}
+                      alt={image.alt}
+                      layout="fill"
+                      objectFit='cover'
+                    />
+                  </CardContent>
+                </Card>
+              </div>
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+        <CarouselPrevious/>
+        <CarouselNext/>
+      </Carousel>
+
       <div className='flex'>
         <div className='w-full'>
           {/* Event name & description */}

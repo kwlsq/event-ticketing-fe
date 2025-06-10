@@ -45,6 +45,7 @@ const eventFormSchema = z.object({
   }, { message: "Date cannot be in the past!" }),
   isEventFree: z.boolean(),
   location: z.string(),
+  categoryID: z.number(),
   ticketTypeRequest: z.array(ticketTypeSchema),
   eventPromotion: z.object({
     name: z.string().min(1, { message: "Promotion name cannot be empty!" }).min(5, { message: "Should be more than 5 characters" }),
@@ -61,9 +62,11 @@ export type EventForm = z.infer<typeof eventFormSchema>;
 
 export default function CreateEvent() {
   const { data: session } = useSession();
-  const { regencies, createEvent, uploadImage, createPromotion } = useEvents();
+  const { regencies, createEvent, uploadImage, createPromotion, categories } = useEvents();
   const [files, setFiles] = useState<FileList | null>(null);
   const [mediaPreviews, setMediaPreviews] = useState<string[]>();
+
+  const filteredCategories = categories?.filter((category) => category.name !== "All");
 
   const { register, control, handleSubmit, watch, setValue, formState: { errors }, } = useForm<EventForm>({
     resolver: zodResolver(eventFormSchema),
@@ -121,6 +124,9 @@ export default function CreateEvent() {
   const onSubmit = async (data: EventForm) => {
     try {
 
+      console.log(data);
+      
+
       let createdEvent = null;
       let imageUploadResponse = false;
       let createPromotionResponse = false;
@@ -156,7 +162,7 @@ export default function CreateEvent() {
         }
 
         console.log(promotionRequest);
-        
+
 
         createPromotionResponse = await createPromotion(promotionRequest, session.accessToken);
 
@@ -345,23 +351,30 @@ export default function CreateEvent() {
                   <label className="text-sm font-medium">
                     Category <span className="text-red-500">*</span>
                   </label>
-                  <Select>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select a category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        <SelectLabel>
-                          Category
-                        </SelectLabel>
-                        <SelectItem value="Music">Music</SelectItem>
-                        <SelectItem value="Art">Art</SelectItem>
-                        <SelectItem value="Workshop">Workshop</SelectItem>
-                        <SelectItem value="Culinary">Culinary</SelectItem>
-                        <SelectItem value="Fair">Fair</SelectItem>
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
+                  <Controller
+                    control={control}
+                    name="categoryID"
+                    render={({ field }) => (
+                      <Select
+                        value={field.value?.toString() ?? ""}
+                        onValueChange={(value) => field.onChange(Number(value))}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select a category" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectGroup>
+                            <SelectLabel>Category</SelectLabel>
+                            {filteredCategories?.map((category) => (
+                              <SelectItem key={category.id} value={category.id.toString()}>
+                                {category.name}
+                              </SelectItem>
+                            ))}
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
                 </div>
               </div>
             </div>
